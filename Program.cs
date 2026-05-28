@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using NotariaParroquial.Data;
@@ -114,6 +115,14 @@ static bool SchemaAlreadyExists(Exception ex)
 // ──────────────────────────────
 // Pipeline
 // ──────────────────────────────
+// Required for Railway (and any reverse-proxy): trust X-Forwarded-Proto so
+// ASP.NET Core sees HTTPS instead of HTTP, which fixes anti-CSRF Origin checks
+// and cookie Secure flags.
+app.UseForwardedHeaders(new ForwardedHeadersOptions
+{
+    ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
+});
+
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");

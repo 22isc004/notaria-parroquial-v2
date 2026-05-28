@@ -29,7 +29,6 @@
             }
 
             <form asp-action="Login" method="post" autocomplete="on">
-                @Html.AntiForgeryToken()
                 <input type="hidden" asp-for="ReturnUrl" />
 
                 <div class="form-floating mb-3">
