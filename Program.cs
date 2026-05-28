@@ -80,12 +80,28 @@ using (var scope = app.Services.CreateScope())
     }
     catch (Exception ex) when (SchemaAlreadyExists(ex))
     {
-        // EnsureDeleted does not work on Railway's hosted PostgreSQL.
-        // Drop and recreate the public schema, then migrate fresh.
-        // Two separate commands avoids the Npgsql NextResult issue with PL/pgSQL DO blocks.
-        logger.LogWarning("Schema mismatch detected — resetting public schema. ex={Msg}", ex.Message);
-        db.Database.ExecuteSqlRaw("DROP SCHEMA IF EXISTS public CASCADE");
-        db.Database.ExecuteSqlRaw("CREATE SCHEMA public");
+        logger.LogWarning("Schema conflict on Railway — resetting database. Error: {Msg}", ex.Message);
+        try
+        {
+            // Fastest reset: drop and recreate the whole schema.
+            db.Database.ExecuteSqlRaw("DROP SCHEMA IF EXISTS public CASCADE");
+            db.Database.ExecuteSqlRaw("CREATE SCHEMA public");
+        }
+        catch (Exception dropEx)
+        {
+            // DROP SCHEMA failed (permissions) — fall back to dropping tables individually.
+            logger.LogWarning("DROP SCHEMA failed ({Msg}), dropping tables one by one.", dropEx.Message);
+            string[] tables =
+            [
+                "AspNetUserTokens", "AspNetUserRoles", "AspNetUserLogins",
+                "AspNetUserClaims", "AspNetRoleClaims",
+                "Pagos", "Matrimonios", "Confirmaciones", "PrimerasComuniones",
+                "Bautizos", "Feligreses", "AspNetUsers", "AspNetRoles",
+                "__EFMigrationsHistory"
+            ];
+            foreach (var t in tables)
+                db.Database.ExecuteSqlRaw($"DROP TABLE IF EXISTS \"{t}\" CASCADE");
+        }
         db.Database.Migrate();
     }
 
@@ -101,10 +117,13 @@ using (var scope = app.Services.CreateScope())
     }
 }
 
+// Walk the full exception chain so nested PostgresException messages are found.
 static bool SchemaAlreadyExists(Exception ex)
 {
-    var msg = ex.Message + (ex.InnerException?.Message ?? string.Empty);
-    return msg.Contains("already exists") || msg.Contains("42P07");
+    for (var e = ex; e != null; e = e.InnerException)
+        if (e.Message.Contains("already exists") || e.Message.Contains("42P07"))
+            return true;
+    return false;
 }
 
 // ──────────────────────────────
