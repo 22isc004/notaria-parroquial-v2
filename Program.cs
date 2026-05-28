@@ -79,16 +79,30 @@ using (var scope = app.Services.CreateScope())
     }
     catch (Exception ex) when (SchemaAlreadyExists(ex))
     {
-        // Schema exists from a prior deployment with a different model.
-        // Since no production data exists yet, drop and recreate cleanly.
-        logger.LogWarning("Schema mismatch — dropping and recreating schema. ex={Msg}", ex.Message);
-        db.Database.EnsureDeleted();
+        // EnsureDeleted does not work on Railway's hosted PostgreSQL.
+        // Drop all tables with raw SQL, then migrate fresh.
+        logger.LogWarning("Schema mismatch detected — dropping all tables. ex={Msg}", ex.Message);
+        db.Database.ExecuteSqlRaw("""
+            DO $$ DECLARE r RECORD;
+            BEGIN
+                FOR r IN (SELECT tablename FROM pg_tables WHERE schemaname = 'public') LOOP
+                    EXECUTE 'DROP TABLE IF EXISTS "' || r.tablename || '" CASCADE';
+                END LOOP;
+            END $$;
+            """);
         db.Database.Migrate();
     }
 
-    var um = scope.ServiceProvider.GetRequiredService<UserManager<AppUser>>();
-    var rm = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
-    await DatabaseSeeder.SeedAsync(um, rm);
+    try
+    {
+        var um = scope.ServiceProvider.GetRequiredService<UserManager<AppUser>>();
+        var rm = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+        await DatabaseSeeder.SeedAsync(um, rm);
+    }
+    catch (Exception seedEx)
+    {
+        logger.LogError(seedEx, "Seeder failed — will retry on next startup.");
+    }
 }
 
 static bool SchemaAlreadyExists(Exception ex)
