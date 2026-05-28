@@ -110,13 +110,16 @@ static bool SchemaAlreadyExists(Exception ex)
 // ──────────────────────────────
 // Pipeline
 // ──────────────────────────────
-// Required for Railway (and any reverse-proxy): trust X-Forwarded-Proto so
-// ASP.NET Core sees HTTPS instead of HTTP, which fixes anti-CSRF Origin checks
-// and cookie Secure flags.
-app.UseForwardedHeaders(new ForwardedHeadersOptions
+// Railway (and most PaaS) terminate TLS at the proxy and forward HTTP internally.
+// Clearing KnownNetworks/KnownProxies makes ASP.NET Core trust X-Forwarded-Proto
+// from any upstream, so Request.Scheme = "https" and anti-CSRF Origin checks pass.
+var fwdOpts = new ForwardedHeadersOptions
 {
     ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
-});
+};
+fwdOpts.KnownNetworks.Clear();
+fwdOpts.KnownProxies.Clear();
+app.UseForwardedHeaders(fwdOpts);
 
 if (!app.Environment.IsDevelopment())
 {
