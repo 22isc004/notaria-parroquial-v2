@@ -71,10 +71,45 @@ var app = builder.Build();
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-    db.Database.Migrate();
+    var logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
+
+    try
+    {
+        db.Database.Migrate();
+    }
+    catch (Exception ex) when (SchemaAlreadyExists(ex))
+    {
+        // Schema exists from a previous non-migration setup.
+        // Record the migration as already applied so future deployments run correctly.
+        logger.LogWarning("Schema already exists — marking migration as applied.");
+        try
+        {
+            db.Database.ExecuteSqlRaw("""
+                CREATE TABLE IF NOT EXISTS "__EFMigrationsHistory" (
+                    "MigrationId" character varying(150) NOT NULL,
+                    "ProductVersion" character varying(32) NOT NULL,
+                    CONSTRAINT "PK___EFMigrationsHistory" PRIMARY KEY ("MigrationId")
+                );
+                INSERT INTO "__EFMigrationsHistory" ("MigrationId", "ProductVersion")
+                VALUES ('20260528005126_InitialCreate', '8.0.5')
+                ON CONFLICT ("MigrationId") DO NOTHING;
+                """);
+        }
+        catch (Exception inner)
+        {
+            logger.LogError(inner, "Could not record migration history.");
+        }
+    }
+
     var um = scope.ServiceProvider.GetRequiredService<UserManager<AppUser>>();
     var rm = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
     await DatabaseSeeder.SeedAsync(um, rm);
+}
+
+static bool SchemaAlreadyExists(Exception ex)
+{
+    var msg = ex.Message + (ex.InnerException?.Message ?? string.Empty);
+    return msg.Contains("already exists") || msg.Contains("42P07");
 }
 
 // ──────────────────────────────
