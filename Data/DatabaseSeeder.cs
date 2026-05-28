@@ -15,7 +15,10 @@ public static class DatabaseSeeder
         }
 
         const string adminEmail = "admin@notaria.mx";
-        if (await userManager.FindByEmailAsync(adminEmail) == null)
+        const string adminPassword = "Admin123!";
+
+        var existing = await userManager.FindByEmailAsync(adminEmail);
+        if (existing == null)
         {
             var admin = new AppUser
             {
@@ -25,9 +28,18 @@ public static class DatabaseSeeder
                 Rol = "Administrador",
                 EmailConfirmed = true
             };
-            var result = await userManager.CreateAsync(admin, "Admin123!");
+            var result = await userManager.CreateAsync(admin, adminPassword);
             if (result.Succeeded)
                 await userManager.AddToRoleAsync(admin, "Administrador");
+        }
+        else
+        {
+            // Ensure password is correct regardless of prior state
+            var token = await userManager.GeneratePasswordResetTokenAsync(existing);
+            await userManager.ResetPasswordAsync(existing, token, adminPassword);
+
+            if (!await userManager.IsInRoleAsync(existing, "Administrador"))
+                await userManager.AddToRoleAsync(existing, "Administrador");
         }
     }
 }
