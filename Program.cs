@@ -81,16 +81,11 @@ using (var scope = app.Services.CreateScope())
     catch (Exception ex) when (SchemaAlreadyExists(ex))
     {
         // EnsureDeleted does not work on Railway's hosted PostgreSQL.
-        // Drop all tables with raw SQL, then migrate fresh.
-        logger.LogWarning("Schema mismatch detected — dropping all tables. ex={Msg}", ex.Message);
-        db.Database.ExecuteSqlRaw("""
-            DO $$ DECLARE r RECORD;
-            BEGIN
-                FOR r IN (SELECT tablename FROM pg_tables WHERE schemaname = 'public') LOOP
-                    EXECUTE 'DROP TABLE IF EXISTS "' || r.tablename || '" CASCADE';
-                END LOOP;
-            END $$;
-            """);
+        // Drop and recreate the public schema, then migrate fresh.
+        // Two separate commands avoids the Npgsql NextResult issue with PL/pgSQL DO blocks.
+        logger.LogWarning("Schema mismatch detected — resetting public schema. ex={Msg}", ex.Message);
+        db.Database.ExecuteSqlRaw("DROP SCHEMA IF EXISTS public CASCADE");
+        db.Database.ExecuteSqlRaw("CREATE SCHEMA public");
         db.Database.Migrate();
     }
 
