@@ -1,0 +1,39 @@
+@model Matrimonio
+@{
+    ViewData["Title"] = "Nuevo Matrimonio";
+}
+<div class="page-header">
+    <div>
+        <h1 class="page-title">Registrar Matrimonio</h1>
+        <nav aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="/Matrimonios">Matrimonios</a></li><li class="breadcrumb-item active">Nuevo</li></ol></nav>
+    </div>
+</div>
+<div class="row justify-content-center">
+    <div class="col-12 col-lg-8">
+        <div class="card-panel">
+            <form asp-action="Create" method="post">
+                @Html.AntiForgeryToken()
+                <div class="form-section-title"><i class="bi bi-heart-fill me-2" style="color:#ec4899"></i>Contrayentes</div>
+                <div class="row g-3">
+                    <div class="col-12 col-md-6"><label asp-for="Contrayente1Nombre" class="form-label"></label><input asp-for="Contrayente1Nombre" class="form-control" placeholder="Nombre completo" /><span asp-validation-for="Contrayente1Nombre" class="text-danger small"></span></div>
+                    <div class="col-12 col-md-6"><label asp-for="Contrayente2Nombre" class="form-label"></label><input asp-for="Contrayente2Nombre" class="form-control" placeholder="Nombre completo" /><span asp-validation-for="Contrayente2Nombre" class="text-danger small"></span></div>
+                </div>
+                <hr class="my-4">
+                <div class="form-section-title"><i class="bi bi-calendar3 me-2"></i>Datos de la Ceremonia</div>
+                <div class="row g-3">
+                    <div class="col-12 col-md-6"><label asp-for="FechaMatrimonio" class="form-label"></label><input asp-for="FechaMatrimonio" class="form-control" type="date" /><span asp-validation-for="FechaMatrimonio" class="text-danger small"></span></div>
+                    <div class="col-12 col-md-6"><label asp-for="Estado" class="form-label"></label><select asp-for="Estado" class="form-select" asp-items="Html.GetEnumSelectList<EstadoSolicitud>()"></select></div>
+                    <div class="col-12"><label asp-for="Sacerdote" class="form-label"></label><input asp-for="Sacerdote" class="form-control" placeholder="Nombre del sacerdote celebrante" /><span asp-validation-for="Sacerdote" class="text-danger small"></span></div>
+                    <div class="col-12 col-md-6"><label asp-for="Testigo1" class="form-label"></label><input asp-for="Testigo1" class="form-control" /></div>
+                    <div class="col-12 col-md-6"><label asp-for="Testigo2" class="form-label"></label><input asp-for="Testigo2" class="form-control" /></div>
+                    <div class="col-12"><label asp-for="Lugar" class="form-label"></label><input asp-for="Lugar" class="form-control" /></div>
+                    <div class="col-12"><label asp-for="Observaciones" class="form-label"></label><textarea asp-for="Observaciones" class="form-control" rows="3"></textarea></div>
+                </div>
+                <div class="form-actions mt-4">
+                    <a href="/Matrimonios" class="btn btn-outline-secondary">Cancelar</a>
+                    <button type="submit" class="btn btn-primary btn-icon"><i class="bi bi-check-lg"></i> Guardar Matrimonio</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

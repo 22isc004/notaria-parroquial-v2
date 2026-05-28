@@ -1,0 +1,82 @@
+@model Bautizo
+@{
+    ViewData["Title"] = "Nuevo Bautizo";
+}
+
+<div class="page-header">
+    <div>
+        <h1 class="page-title">Registrar Bautizo</h1>
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="/Bautizos">Bautizos</a></li>
+                <li class="breadcrumb-item active">Nuevo</li>
+            </ol>
+        </nav>
+    </div>
+</div>
+
+<div class="row justify-content-center">
+    <div class="col-12 col-lg-8">
+        <div class="card-panel">
+            <form asp-action="Create" method="post">
+                @Html.AntiForgeryToken()
+                <div class="form-section-title"><i class="bi bi-droplet-fill me-2 text-primary"></i>Datos del Bautizo</div>
+                <div class="row g-3">
+                    <div class="col-12">
+                        <label asp-for="FeligresId" class="form-label">Feligrés</label>
+                        <select asp-for="FeligresId" class="form-select" asp-items="ViewBag.FeligresList">
+                            <option value="">— Seleccionar feligrés —</option>
+                        </select>
+                        <span asp-validation-for="FeligresId" class="text-danger small"></span>
+                        <div class="mt-1">
+                            <a href="/Feligreses/Create" target="_blank" class="small text-primary">
+                                <i class="bi bi-plus-circle me-1"></i>Registrar nuevo feligrés
+                            </a>
+                        </div>
+                    </div>
+                    <div class="col-12 col-md-6">
+                        <label asp-for="FechaBautizo" class="form-label"></label>
+                        <input asp-for="FechaBautizo" class="form-control" type="date" />
+                        <span asp-validation-for="FechaBautizo" class="text-danger small"></span>
+                    </div>
+                    <div class="col-12 col-md-6">
+                        <label asp-for="Estado" class="form-label"></label>
+                        <select asp-for="Estado" class="form-select" asp-items="Html.GetEnumSelectList<EstadoSolicitud>()"></select>
+                        <span asp-validation-for="Estado" class="text-danger small"></span>
+                    </div>
+                    <div class="col-12">
+                        <label asp-for="Sacerdote" class="form-label"></label>
+                        <input asp-for="Sacerdote" class="form-control" placeholder="Nombre del sacerdote celebrante" />
+                        <span asp-validation-for="Sacerdote" class="text-danger small"></span>
+                    </div>
+                    <div class="col-12 col-md-6">
+                        <label asp-for="PadrinoNombre" class="form-label"></label>
+                        <input asp-for="PadrinoNombre" class="form-control" placeholder="Nombre completo del padrino" />
+                        <span asp-validation-for="PadrinoNombre" class="text-danger small"></span>
+                    </div>
+                    <div class="col-12 col-md-6">
+                        <label asp-for="MadrinaNombre" class="form-label"></label>
+                        <input asp-for="MadrinaNombre" class="form-control" placeholder="Nombre completo de la madrina" />
+                        <span asp-validation-for="MadrinaNombre" class="text-danger small"></span>
+                    </div>
+                    <div class="col-12">
+                        <label asp-for="LugarBautizo" class="form-label"></label>
+                        <input asp-for="LugarBautizo" class="form-control" placeholder="Iglesia o lugar de celebración" />
+                        <span asp-validation-for="LugarBautizo" class="text-danger small"></span>
+                    </div>
+                    <div class="col-12">
+                        <label asp-for="Observaciones" class="form-label"></label>
+                        <textarea asp-for="Observaciones" class="form-control" rows="3" placeholder="Notas adicionales…"></textarea>
+                        <span asp-validation-for="Observaciones" class="text-danger small"></span>
+                    </div>
+                </div>
+                <div class="form-actions mt-4">
+                    <a href="/Bautizos" class="btn btn-outline-secondary">Cancelar</a>
+                    <button type="submit" class="btn btn-primary btn-icon">
+                        <i class="bi bi-check-lg"></i> Guardar Bautizo
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

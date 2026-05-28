@@ -1,0 +1,104 @@
+@model Feligres
+@{
+    ViewData["Title"] = "Nuevo Feligrés";
+}
+
+<div class="page-header">
+    <div>
+        <h1 class="page-title">Nuevo Feligrés</h1>
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="/Feligreses">Feligreses</a></li>
+                <li class="breadcrumb-item active">Nuevo</li>
+            </ol>
+        </nav>
+    </div>
+</div>
+
+<div class="row justify-content-center">
+    <div class="col-12 col-lg-8">
+        <div class="card-panel">
+            <form asp-action="Create" method="post">
+                @Html.AntiForgeryToken()
+                <div class="form-section-title"><i class="bi bi-person me-2"></i>Datos Personales</div>
+                <div class="row g-3">
+                    <div class="col-12 col-md-4">
+                        <label asp-for="Nombre" class="form-label"></label>
+                        <input asp-for="Nombre" class="form-control" placeholder="Ej. María del Carmen" autofocus />
+                        <span asp-validation-for="Nombre" class="text-danger small"></span>
+                    </div>
+                    <div class="col-12 col-md-4">
+                        <label asp-for="ApellidoPaterno" class="form-label"></label>
+                        <input asp-for="ApellidoPaterno" class="form-control" placeholder="Apellido paterno" />
+                        <span asp-validation-for="ApellidoPaterno" class="text-danger small"></span>
+                    </div>
+                    <div class="col-12 col-md-4">
+                        <label asp-for="ApellidoMaterno" class="form-label"></label>
+                        <input asp-for="ApellidoMaterno" class="form-control" placeholder="Apellido materno" />
+                        <span asp-validation-for="ApellidoMaterno" class="text-danger small"></span>
+                    </div>
+                    <div class="col-12 col-md-4">
+                        <label asp-for="FechaNacimiento" class="form-label"></label>
+                        <input asp-for="FechaNacimiento" class="form-control" type="date" />
+                        <span asp-validation-for="FechaNacimiento" class="text-danger small"></span>
+                    </div>
+                    <div class="col-12 col-md-4">
+                        <label asp-for="Genero" class="form-label"></label>
+                        <select asp-for="Genero" class="form-select" asp-items="Html.GetEnumSelectList<Genero>()">
+                            <option value="">Seleccionar…</option>
+                        </select>
+                        <span asp-validation-for="Genero" class="text-danger small"></span>
+                    </div>
+                    <div class="col-12 col-md-4">
+                        <label asp-for="Curp" class="form-label"></label>
+                        <input asp-for="Curp" class="form-control font-mono" placeholder="XXXX000000XXXXXX00" style="text-transform:uppercase" />
+                        <span asp-validation-for="Curp" class="text-danger small"></span>
+                    </div>
+                </div>
+
+                <hr class="my-4">
+                <div class="form-section-title"><i class="bi bi-geo-alt me-2"></i>Contacto y Ubicación</div>
+                <div class="row g-3">
+                    <div class="col-12 col-md-6">
+                        <label asp-for="Telefono" class="form-label"></label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="bi bi-telephone"></i></span>
+                            <input asp-for="Telefono" class="form-control" placeholder="10 dígitos" />
+                        </div>
+                        <span asp-validation-for="Telefono" class="text-danger small"></span>
+                    </div>
+                    <div class="col-12 col-md-6">
+                        <label asp-for="Email" class="form-label"></label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="bi bi-envelope"></i></span>
+                            <input asp-for="Email" class="form-control" placeholder="correo@ejemplo.com" type="email" />
+                        </div>
+                        <span asp-validation-for="Email" class="text-danger small"></span>
+                    </div>
+                    <div class="col-12">
+                        <label asp-for="Direccion" class="form-label"></label>
+                        <input asp-for="Direccion" class="form-control" placeholder="Calle, número, colonia" />
+                        <span asp-validation-for="Direccion" class="text-danger small"></span>
+                    </div>
+                    <div class="col-12 col-md-6">
+                        <label asp-for="Comunidad" class="form-label"></label>
+                        <input asp-for="Comunidad" class="form-control" placeholder="Comunidad o localidad" />
+                        <span asp-validation-for="Comunidad" class="text-danger small"></span>
+                    </div>
+                    <div class="col-12 col-md-6">
+                        <label asp-for="Municipio" class="form-label"></label>
+                        <input asp-for="Municipio" class="form-control" />
+                        <span asp-validation-for="Municipio" class="text-danger small"></span>
+                    </div>
+                </div>
+
+                <div class="form-actions mt-4">
+                    <a href="/Feligreses" class="btn btn-outline-secondary">Cancelar</a>
+                    <button type="submit" class="btn btn-primary btn-icon">
+                        <i class="bi bi-check-lg"></i> Guardar Feligrés
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

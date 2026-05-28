@@ -1,0 +1,34 @@
+@model Matrimonio
+@{
+    ViewData["Title"] = $"Matrimonio — {Model.NumeroActa}";
+}
+<div class="page-header">
+    <div>
+        <h1 class="page-title">Detalle de Matrimonio</h1>
+        <nav aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="/Matrimonios">Matrimonios</a></li><li class="breadcrumb-item active">@Model.NumeroActa</li></ol></nav>
+    </div>
+    <a href="/Matrimonios/Edit/@Model.Id" class="btn btn-primary btn-icon"><i class="bi bi-pencil"></i> Editar</a>
+</div>
+<div class="row g-4">
+    <div class="col-12 col-lg-8">
+        <div class="card-panel">
+            <div class="panel-header"><h5 class="panel-title"><i class="bi bi-heart-fill me-2" style="color:#ec4899"></i>Información del Matrimonio</h5></div>
+            <div class="detail-grid">
+                <div class="detail-item"><span class="detail-label">No. Acta</span><code class="detail-value">@Model.NumeroActa</code></div>
+                <div class="detail-item"><span class="detail-label">Contrayente 1</span><span class="detail-value">@Model.Contrayente1Nombre</span></div>
+                <div class="detail-item"><span class="detail-label">Contrayente 2</span><span class="detail-value">@Model.Contrayente2Nombre</span></div>
+                <div class="detail-item"><span class="detail-label">Fecha</span><span class="detail-value">@Model.FechaMatrimonio.ToString("dd MMMM yyyy")</span></div>
+                <div class="detail-item"><span class="detail-label">Sacerdote</span><span class="detail-value">@Model.Sacerdote</span></div>
+                <div class="detail-item"><span class="detail-label">Testigo 1</span><span class="detail-value">@(Model.Testigo1 ?? "—")</span></div>
+                <div class="detail-item"><span class="detail-label">Testigo 2</span><span class="detail-value">@(Model.Testigo2 ?? "—")</span></div>
+                <div class="detail-item"><span class="detail-label">Lugar</span><span class="detail-value">@(Model.Lugar ?? "—")</span></div>
+                <div class="detail-item">
+                    <span class="detail-label">Estado</span>
+                    <span class="detail-value"><span class="badge @(Model.Estado == EstadoSolicitud.Completado ? "badge-success" : Model.Estado == EstadoSolicitud.Pendiente ? "badge-warning" : "badge-info")">@Model.Estado</span></span>
+                </div>
+            </div>
+            @if (!string.IsNullOrEmpty(Model.Observaciones))
+            { <hr><p class="text-muted small mb-0"><strong>Observaciones:</strong> @Model.Observaciones</p> }
+        </div>
+    </div>
+</div>

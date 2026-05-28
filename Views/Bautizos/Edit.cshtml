@@ -1,0 +1,71 @@
+@model Bautizo
+@{
+    ViewData["Title"] = "Editar Bautizo";
+}
+<div class="page-header">
+    <div>
+        <h1 class="page-title">Editar Bautizo</h1>
+        <nav aria-label="breadcrumb"><ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="/Bautizos">Bautizos</a></li>
+            <li class="breadcrumb-item active">Editar</li>
+        </ol></nav>
+    </div>
+</div>
+<div class="row justify-content-center">
+    <div class="col-12 col-lg-8">
+        <div class="card-panel">
+            <form asp-action="Edit" method="post">
+                @Html.AntiForgeryToken()
+                <input asp-for="Id" type="hidden" />
+                <input asp-for="FechaRegistro" type="hidden" />
+                <input asp-for="NumeroBoleta" type="hidden" />
+                <div class="form-section-title"><i class="bi bi-droplet-fill me-2 text-primary"></i>Datos del Bautizo</div>
+                <div class="row g-3">
+                    <div class="col-12">
+                        <label asp-for="FeligresId" class="form-label">Feligrés</label>
+                        <select asp-for="FeligresId" class="form-select" asp-items="ViewBag.FeligresList">
+                            <option value="">— Seleccionar feligrés —</option>
+                        </select>
+                        <span asp-validation-for="FeligresId" class="text-danger small"></span>
+                    </div>
+                    <div class="col-12 col-md-6">
+                        <label asp-for="FechaBautizo" class="form-label"></label>
+                        <input asp-for="FechaBautizo" class="form-control" type="date" />
+                        <span asp-validation-for="FechaBautizo" class="text-danger small"></span>
+                    </div>
+                    <div class="col-12 col-md-6">
+                        <label asp-for="Estado" class="form-label"></label>
+                        <select asp-for="Estado" class="form-select" asp-items="Html.GetEnumSelectList<EstadoSolicitud>()"></select>
+                    </div>
+                    <div class="col-12">
+                        <label asp-for="Sacerdote" class="form-label"></label>
+                        <input asp-for="Sacerdote" class="form-control" />
+                        <span asp-validation-for="Sacerdote" class="text-danger small"></span>
+                    </div>
+                    <div class="col-12 col-md-6">
+                        <label asp-for="PadrinoNombre" class="form-label"></label>
+                        <input asp-for="PadrinoNombre" class="form-control" />
+                    </div>
+                    <div class="col-12 col-md-6">
+                        <label asp-for="MadrinaNombre" class="form-label"></label>
+                        <input asp-for="MadrinaNombre" class="form-control" />
+                    </div>
+                    <div class="col-12">
+                        <label asp-for="LugarBautizo" class="form-label"></label>
+                        <input asp-for="LugarBautizo" class="form-control" />
+                    </div>
+                    <div class="col-12">
+                        <label asp-for="Observaciones" class="form-label"></label>
+                        <textarea asp-for="Observaciones" class="form-control" rows="3"></textarea>
+                    </div>
+                </div>
+                <div class="form-actions mt-4">
+                    <a href="/Bautizos" class="btn btn-outline-secondary">Cancelar</a>
+                    <button type="submit" class="btn btn-primary btn-icon">
+                        <i class="bi bi-check-lg"></i> Guardar Cambios
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

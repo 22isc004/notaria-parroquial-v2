@@ -1,0 +1,58 @@
+@model IEnumerable<Confirmacion>
+@{
+    ViewData["Title"] = "Confirmaciones";
+    string q = ViewBag.Query ?? "";
+    int page = ViewBag.Page; int totalPages = ViewBag.TotalPages;
+    EstadoSolicitud? estado = ViewBag.Estado;
+}
+<div class="page-header">
+    <div>
+        <h1 class="page-title"><i class="bi bi-shield-fill-check text-warning me-2"></i>Confirmaciones</h1>
+        <p class="page-desc">@ViewBag.Total registro(s)</p>
+    </div>
+    <a href="/Confirmaciones/Create" class="btn btn-primary btn-icon"><i class="bi bi-plus-lg"></i> Nueva Confirmación</a>
+</div>
+<div class="card-panel mb-4">
+    <form method="get" class="row g-2 align-items-end">
+        <div class="col-12 col-md-6"><div class="input-group"><span class="input-group-text"><i class="bi bi-search"></i></span><input type="text" name="q" value="@q" class="form-control" placeholder="Buscar…" /></div></div>
+        <div class="col-12 col-md-3"><select name="estado" class="form-select"><option value="">Todos</option>@foreach (EstadoSolicitud e in Enum.GetValues<EstadoSolicitud>()) { <option value="@((int)e)" selected="@(estado == e)">@e</option> }</select></div>
+        <div class="col-auto"><button type="submit" class="btn btn-primary">Filtrar</button>@if (!string.IsNullOrEmpty(q) || estado.HasValue) { <a href="/Confirmaciones" class="btn btn-outline-secondary ms-1">Limpiar</a> }</div>
+    </form>
+</div>
+@if (Model.Any())
+{
+    <div class="card-panel p-0">
+        <div class="table-responsive">
+            <table class="table table-hover data-table mb-0">
+                <thead><tr><th>Boleta</th><th>Feligrés</th><th>Fecha</th><th>Nombre Confirmación</th><th>Estado</th><th class="text-end">Acciones</th></tr></thead>
+                <tbody>
+                    @foreach (var c in Model)
+                    {
+                        <tr>
+                            <td><code class="badge-code">@c.NumeroBoleta</code></td>
+                            <td><div class="fw-500">@c.Feligres?.NombreCompleto</div><small class="text-muted">@c.Feligres?.Comunidad</small></td>
+                            <td>@c.FechaConfirmacion.ToString("dd/MM/yyyy")</td>
+                            <td>@(c.NombreConfirmacion ?? "—")</td>
+                            <td><span class="badge @(c.Estado == EstadoSolicitud.Completado ? "badge-success" : c.Estado == EstadoSolicitud.Pendiente ? "badge-warning" : "badge-info")">@c.Estado</span></td>
+                            <td class="text-end">
+                                <div class="btn-group btn-group-sm">
+                                    <a href="/Confirmaciones/Details/@c.Id" class="btn btn-outline-secondary" aria-label="Ver"><i class="bi bi-eye"></i></a>
+                                    <a href="/Confirmaciones/Edit/@c.Id" class="btn btn-outline-primary" aria-label="Editar"><i class="bi bi-pencil"></i></a>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+}
+else
+{
+    <div class="empty-state">
+        <div class="empty-icon text-warning"><i class="bi bi-shield-check"></i></div>
+        <h3>Sin confirmaciones registradas</h3>
+        <p class="text-muted">Registra la primera confirmación de la parroquia.</p>
+        <a href="/Confirmaciones/Create" class="btn btn-primary btn-icon"><i class="bi bi-plus-lg"></i> Nueva Confirmación</a>
+    </div>
+}

@@ -1,0 +1,71 @@
+@model Pago
+@{
+    ViewData["Title"] = "Registrar Pago";
+}
+<div class="page-header">
+    <div>
+        <h1 class="page-title">Registrar Pago</h1>
+        <nav aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="/Pagos">Pagos</a></li><li class="breadcrumb-item active">Nuevo</li></ol></nav>
+    </div>
+</div>
+<div class="row justify-content-center">
+    <div class="col-12 col-lg-7">
+        <div class="card-panel">
+            <form asp-action="Create" method="post">
+                @Html.AntiForgeryToken()
+                <div class="form-section-title"><i class="bi bi-receipt me-2 text-success"></i>Información del Pago</div>
+                <div class="row g-3">
+                    <div class="col-12 col-md-6">
+                        <label asp-for="TipoServicio" class="form-label"></label>
+                        <select asp-for="TipoServicio" class="form-select" asp-items="Html.GetEnumSelectList<TipoServicio>()"><option value="">— Seleccionar —</option></select>
+                        <span asp-validation-for="TipoServicio" class="text-danger small"></span>
+                    </div>
+                    <div class="col-12 col-md-6">
+                        <label asp-for="MetodoPago" class="form-label"></label>
+                        <select asp-for="MetodoPago" class="form-select" asp-items="Html.GetEnumSelectList<MetodoPago>()"></select>
+                    </div>
+                    <div class="col-12">
+                        <label asp-for="NombreSolicitante" class="form-label"></label>
+                        <input asp-for="NombreSolicitante" class="form-control" placeholder="Nombre completo del feligrés" />
+                        <span asp-validation-for="NombreSolicitante" class="text-danger small"></span>
+                    </div>
+                    <div class="col-12">
+                        <label asp-for="EmailNotificacion" class="form-label"></label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="bi bi-envelope"></i></span>
+                            <input asp-for="EmailNotificacion" class="form-control" type="email" placeholder="correo@ejemplo.com" />
+                        </div>
+                        <div class="form-text">Al confirmar el pago, se enviará un correo automático a esta dirección.</div>
+                        <span asp-validation-for="EmailNotificacion" class="text-danger small"></span>
+                    </div>
+                    <div class="col-12 col-md-6">
+                        <label asp-for="Monto" class="form-label"></label>
+                        <div class="input-group">
+                            <span class="input-group-text">$</span>
+                            <input asp-for="Monto" class="form-control" type="number" step="0.01" min="0" placeholder="0.00" />
+                            <span class="input-group-text">MXN</span>
+                        </div>
+                        <span asp-validation-for="Monto" class="text-danger small"></span>
+                    </div>
+                    <div class="col-12 col-md-6">
+                        <label asp-for="FechaPago" class="form-label"></label>
+                        <input asp-for="FechaPago" class="form-control" type="date" />
+                        <span asp-validation-for="FechaPago" class="text-danger small"></span>
+                    </div>
+                    <div class="col-12">
+                        <label asp-for="Notas" class="form-label"></label>
+                        <textarea asp-for="Notas" class="form-control" rows="3" placeholder="Observaciones adicionales…"></textarea>
+                    </div>
+                </div>
+                <div class="alert alert-info d-flex align-items-center gap-2 mt-3">
+                    <i class="bi bi-info-circle-fill flex-shrink-0"></i>
+                    <div class="small">El pago se registrará como <strong>Pendiente</strong>. Desde el detalle podrás confirmarlo o rechazarlo.</div>
+                </div>
+                <div class="form-actions mt-4">
+                    <a href="/Pagos" class="btn btn-outline-secondary">Cancelar</a>
+                    <button type="submit" class="btn btn-primary btn-icon"><i class="bi bi-check-lg"></i> Registrar Pago</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

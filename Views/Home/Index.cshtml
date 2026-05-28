@@ -1,0 +1,229 @@
+@model DashboardViewModel
+@{
+    ViewData["Title"] = "Dashboard";
+}
+
+<!-- Stats Cards -->
+<div class="row g-4 mb-4">
+    <div class="col-12 col-sm-6 col-xl-3">
+        <div class="stat-card stat-blue">
+            <div class="stat-icon"><i class="bi bi-people-fill"></i></div>
+            <div class="stat-content">
+                <div class="stat-value">@Model.TotalFeligreses.ToString("N0")</div>
+                <div class="stat-label">Feligreses Registrados</div>
+            </div>
+            <div class="stat-trend"><i class="bi bi-arrow-up-right"></i> Total</div>
+        </div>
+    </div>
+    <div class="col-12 col-sm-6 col-xl-3">
+        <div class="stat-card stat-green">
+            <div class="stat-icon"><i class="bi bi-calendar-check-fill"></i></div>
+            <div class="stat-content">
+                <div class="stat-value">@Model.ServiciosMes</div>
+                <div class="stat-label">Servicios este Mes</div>
+            </div>
+            <div class="stat-trend"><i class="bi bi-calendar3"></i> @DateTime.Now.ToString("MMMM")</div>
+        </div>
+    </div>
+    <div class="col-12 col-sm-6 col-xl-3">
+        <div class="stat-card stat-amber">
+            <div class="stat-icon"><i class="bi bi-clock-fill"></i></div>
+            <div class="stat-content">
+                <div class="stat-value">@Model.PagosPendientes</div>
+                <div class="stat-label">Pagos Pendientes</div>
+            </div>
+            <div class="stat-trend"><a href="/Pagos?estado=1" class="stat-link">Ver todos <i class="bi bi-arrow-right"></i></a></div>
+        </div>
+    </div>
+    <div class="col-12 col-sm-6 col-xl-3">
+        <div class="stat-card stat-purple">
+            <div class="stat-icon"><i class="bi bi-cash-coin"></i></div>
+            <div class="stat-content">
+                <div class="stat-value">$@Model.IngresosMes.ToString("N0")</div>
+                <div class="stat-label">Ingresos del Mes</div>
+            </div>
+            <div class="stat-trend"><i class="bi bi-graph-up"></i> MXN</div>
+        </div>
+    </div>
+</div>
+
+<!-- Charts Row -->
+<div class="row g-4 mb-4">
+    <div class="col-12 col-lg-7">
+        <div class="card-panel">
+            <div class="panel-header">
+                <div>
+                    <h5 class="panel-title">Servicios por Mes</h5>
+                    <p class="panel-subtitle">Últimos 6 meses</p>
+                </div>
+            </div>
+            <div class="chart-container" style="height:260px">
+                <canvas id="chartServicios"></canvas>
+            </div>
+        </div>
+    </div>
+    <div class="col-12 col-lg-5">
+        <div class="card-panel">
+            <div class="panel-header">
+                <div>
+                    <h5 class="panel-title">Distribución de Servicios</h5>
+                    <p class="panel-subtitle">Total acumulado</p>
+                </div>
+            </div>
+            <div class="chart-container" style="height:220px">
+                <canvas id="chartDistribucion"></canvas>
+            </div>
+            <div class="chart-legend mt-3">
+                <span class="legend-item"><span class="legend-dot" style="background:#6366f1"></span>Bautizos (@Model.TotalBautizos)</span>
+                <span class="legend-item"><span class="legend-dot" style="background:#22c55e"></span>Comuniones (@Model.TotalComuniones)</span>
+                <span class="legend-item"><span class="legend-dot" style="background:#f59e0b"></span>Confirmaciones (@Model.TotalConfirmaciones)</span>
+                <span class="legend-item"><span class="legend-dot" style="background:#ec4899"></span>Matrimonios (@Model.TotalMatrimonios)</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Quick Actions + Activity -->
+<div class="row g-4">
+    <div class="col-12 col-lg-4">
+        <div class="card-panel h-100">
+            <div class="panel-header">
+                <h5 class="panel-title">Acciones Rápidas</h5>
+            </div>
+            <div class="quick-actions">
+                <a href="/Feligreses/Create" class="quick-btn quick-blue">
+                    <i class="bi bi-person-plus-fill"></i>
+                    <span>Nuevo Feligrés</span>
+                </a>
+                <a href="/Bautizos/Create" class="quick-btn quick-indigo">
+                    <i class="bi bi-droplet-fill"></i>
+                    <span>Registrar Bautizo</span>
+                </a>
+                <a href="/Comuniones/Create" class="quick-btn quick-green">
+                    <i class="bi bi-cup-hot-fill"></i>
+                    <span>Primera Comunión</span>
+                </a>
+                <a href="/Confirmaciones/Create" class="quick-btn quick-amber">
+                    <i class="bi bi-shield-fill-check"></i>
+                    <span>Confirmación</span>
+                </a>
+                <a href="/Matrimonios/Create" class="quick-btn quick-pink">
+                    <i class="bi bi-heart-fill"></i>
+                    <span>Matrimonio</span>
+                </a>
+                <a href="/Pagos/Create" class="quick-btn quick-teal">
+                    <i class="bi bi-receipt"></i>
+                    <span>Registrar Pago</span>
+                </a>
+            </div>
+        </div>
+    </div>
+    <div class="col-12 col-lg-8">
+        <div class="card-panel">
+            <div class="panel-header">
+                <div>
+                    <h5 class="panel-title">Actividad Reciente</h5>
+                    <p class="panel-subtitle">Últimos registros ingresados</p>
+                </div>
+            </div>
+            @if (Model.ActividadesRecientes.Any())
+            {
+                <div class="activity-list">
+                    @foreach (var a in Model.ActividadesRecientes)
+                    {
+                        <a href="@a.Url" class="activity-item">
+                            <div class="activity-icon activity-@a.TipoServicio.ToLower().Replace(" ", "")">
+                                <i class="bi @a.TipoIcono"></i>
+                            </div>
+                            <div class="activity-info">
+                                <span class="activity-name">@a.Nombre</span>
+                                <span class="activity-type">@a.TipoServicio</span>
+                            </div>
+                            <div class="activity-meta">
+                                <span class="badge @a.EstadoClass">@a.Estado</span>
+                                <span class="activity-date">@a.Fecha.ToString("dd/MM/yy")</span>
+                            </div>
+                        </a>
+                    }
+                </div>
+            }
+            else
+            {
+                <div class="empty-state-sm">
+                    <i class="bi bi-inbox"></i>
+                    <p>Sin actividad reciente</p>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+<script>
+const meses = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.MesesLabels));
+const datos = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.ServiciosPorMes));
+const bautizos = @Model.TotalBautizos;
+const comuniones = @Model.TotalComuniones;
+const confirmaciones = @Model.TotalConfirmaciones;
+const matrimonios = @Model.TotalMatrimonios;
+
+// Line chart
+const ctxLine = document.getElementById('chartServicios').getContext('2d');
+const gradLine = ctxLine.createLinearGradient(0, 0, 0, 260);
+gradLine.addColorStop(0, 'rgba(99,102,241,0.3)');
+gradLine.addColorStop(1, 'rgba(99,102,241,0)');
+new Chart(ctxLine, {
+    type: 'line',
+    data: {
+        labels: meses,
+        datasets: [{
+            label: 'Servicios',
+            data: datos,
+            borderColor: '#6366f1',
+            backgroundColor: gradLine,
+            borderWidth: 2.5,
+            pointBackgroundColor: '#6366f1',
+            pointRadius: 4,
+            pointHoverRadius: 6,
+            fill: true,
+            tension: 0.4
+        }]
+    },
+    options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: { legend: { display: false }, tooltip: { mode: 'index', intersect: false,
+            backgroundColor: 'rgba(15,23,42,0.9)', titleColor: '#e2e8f0', bodyColor: '#94a3b8',
+            padding: 12, cornerRadius: 8 }},
+        scales: {
+            x: { grid: { display: false }, ticks: { color: '#94a3b8', font: { size: 12 }}},
+            y: { grid: { color: 'rgba(148,163,184,0.1)' }, ticks: { color: '#94a3b8', stepSize: 1, font: { size: 12 }}}
+        }
+    }
+});
+
+// Donut chart
+const ctxDnt = document.getElementById('chartDistribucion').getContext('2d');
+new Chart(ctxDnt, {
+    type: 'doughnut',
+    data: {
+        labels: ['Bautizos','Primera Comunión','Confirmaciones','Matrimonios'],
+        datasets: [{
+            data: [bautizos, comuniones, confirmaciones, matrimonios],
+            backgroundColor: ['#6366f1','#22c55e','#f59e0b','#ec4899'],
+            borderWidth: 0,
+            hoverOffset: 6
+        }]
+    },
+    options: {
+        responsive: true, maintainAspectRatio: false, cutout: '72%',
+        plugins: {
+            legend: { display: false },
+            tooltip: {
+                backgroundColor: 'rgba(15,23,42,0.9)', titleColor: '#e2e8f0', bodyColor: '#94a3b8',
+                padding: 12, cornerRadius: 8
+            }
+        }
+    }
+});
+</script>
+}

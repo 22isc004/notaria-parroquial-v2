@@ -1,0 +1,155 @@
+@model IEnumerable<Feligres>
+@{
+    ViewData["Title"] = "Feligreses";
+    int page = ViewBag.Page;
+    int totalPages = ViewBag.TotalPages;
+    string q = ViewBag.Query ?? "";
+}
+
+<div class="page-header">
+    <div>
+        <h1 class="page-title">Feligreses</h1>
+        <p class="page-desc">@ViewBag.Total registro(s) encontrado(s)</p>
+    </div>
+    <a href="/Feligreses/Create" class="btn btn-primary btn-icon">
+        <i class="bi bi-plus-lg"></i> Nuevo Feligrés
+    </a>
+</div>
+
+<div class="card-panel mb-4">
+    <form method="get" class="search-bar">
+        <div class="input-group">
+            <span class="input-group-text"><i class="bi bi-search"></i></span>
+            <input type="text" name="q" value="@q" class="form-control" placeholder="Buscar por nombre, apellido, comunidad o CURP…" />
+            <button type="submit" class="btn btn-primary">Buscar</button>
+            @if (!string.IsNullOrEmpty(q))
+            {
+                <a href="/Feligreses" class="btn btn-outline-secondary">Limpiar</a>
+            }
+        </div>
+    </form>
+</div>
+
+@if (Model.Any())
+{
+    <div class="card-panel p-0">
+        <div class="table-responsive">
+            <table class="table table-hover data-table mb-0">
+                <thead>
+                    <tr>
+                        <th>Nombre completo</th>
+                        <th>Comunidad</th>
+                        <th>Teléfono</th>
+                        <th>Correo</th>
+                        <th>Registro</th>
+                        <th class="text-end">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var f in Model)
+                    {
+                        <tr>
+                            <td>
+                                <div class="d-flex align-items-center gap-2">
+                                    <div class="avatar avatar-sm avatar-@(f.Genero == Genero.Femenino ? "pink" : "blue")">
+                                        @f.Nombre[0]@f.ApellidoPaterno[0]
+                                    </div>
+                                    <div>
+                                        <div class="fw-500">@f.NombreCompleto</div>
+                                        @if (!string.IsNullOrEmpty(f.Curp))
+                                        {
+                                            <small class="text-muted font-mono">@f.Curp</small>
+                                        }
+                                    </div>
+                                </div>
+                            </td>
+                            <td><span class="badge badge-light">@f.Comunidad</span></td>
+                            <td>@(f.Telefono ?? "—")</td>
+                            <td>@(f.Email ?? "—")</td>
+                            <td><span class="text-muted small">@f.FechaRegistro.ToString("dd/MM/yyyy")</span></td>
+                            <td class="text-end">
+                                <div class="btn-group btn-group-sm">
+                                    <a href="/Feligreses/Details/@f.Id" class="btn btn-outline-secondary" aria-label="Ver detalle">
+                                        <i class="bi bi-eye"></i>
+                                    </a>
+                                    <a href="/Feligreses/Edit/@f.Id" class="btn btn-outline-primary" aria-label="Editar">
+                                        <i class="bi bi-pencil"></i>
+                                    </a>
+                                    <button type="button" class="btn btn-outline-danger"
+                                            aria-label="Eliminar"
+                                            onclick="confirmDelete('/Feligreses/Delete/@f.Id', '@f.NombreCompleto')">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    @if (totalPages > 1)
+    {
+        <nav class="mt-4 d-flex justify-content-center">
+            <ul class="pagination">
+                <li class="page-item @(page <= 1 ? "disabled" : "")">
+                    <a class="page-link" href="?q=@q&page=@(page - 1)"><i class="bi bi-chevron-left"></i></a>
+                </li>
+                @for (int i = Math.Max(1, page - 2); i <= Math.Min(totalPages, page + 2); i++)
+                {
+                    <li class="page-item @(i == page ? "active" : "")">
+                        <a class="page-link" href="?q=@q&page=@i">@i</a>
+                    </li>
+                }
+                <li class="page-item @(page >= totalPages ? "disabled" : "")">
+                    <a class="page-link" href="?q=@q&page=@(page + 1)"><i class="bi bi-chevron-right"></i></a>
+                </li>
+            </ul>
+        </nav>
+    }
+}
+else
+{
+    <div class="empty-state">
+        <div class="empty-icon"><i class="bi bi-people"></i></div>
+        <h3>Sin feligreses registrados</h3>
+        <p class="text-muted">Comienza registrando el primer feligrés de la parroquia.</p>
+        <a href="/Feligreses/Create" class="btn btn-primary btn-icon">
+            <i class="bi bi-plus-lg"></i> Registrar Feligrés
+        </a>
+    </div>
+}
+
+<!-- Delete confirm modal -->
+<div class="modal fade" id="deleteModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header border-0">
+                <h5 class="modal-title">Confirmar eliminación</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>¿Estás seguro de que deseas eliminar a <strong id="deleteItemName"></strong>?</p>
+                <p class="text-muted small">Esta acción no se puede deshacer.</p>
+            </div>
+            <div class="modal-footer border-0">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <form id="deleteForm" method="post">
+                    @Html.AntiForgeryToken()
+                    <button type="submit" class="btn btn-danger">Eliminar</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+<script>
+function confirmDelete(url, name) {
+    document.getElementById('deleteForm').action = url;
+    document.getElementById('deleteItemName').textContent = name;
+    new bootstrap.Modal(document.getElementById('deleteModal')).show();
+}
+</script>
+}

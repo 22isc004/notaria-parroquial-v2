@@ -1,0 +1,28 @@
+## .NET
+bin/
+obj/
+*.user
+*.suo
+.vs/
+*.db
+*.db-shm
+*.db-wal
+
+## ASP.NET
+wwwroot/lib/
+appsettings.Development.json
+
+## Rider
+.idea/
+
+## VS Code
+.vscode/
+!.vscode/extensions.json
+
+## OS
+.DS_Store
+Thumbs.db
+
+## Logs
+logs/
+*.log

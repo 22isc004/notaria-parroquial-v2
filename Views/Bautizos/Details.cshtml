@@ -1,0 +1,80 @@
+@model Bautizo
+@{
+    ViewData["Title"] = $"Bautizo — {Model.NumeroBoleta}";
+}
+<div class="page-header">
+    <div>
+        <h1 class="page-title">Detalle de Bautizo</h1>
+        <nav aria-label="breadcrumb"><ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="/Bautizos">Bautizos</a></li>
+            <li class="breadcrumb-item active">@Model.NumeroBoleta</li>
+        </ol></nav>
+    </div>
+    <a href="/Bautizos/Edit/@Model.Id" class="btn btn-primary btn-icon">
+        <i class="bi bi-pencil"></i> Editar
+    </a>
+</div>
+<div class="row g-4">
+    <div class="col-12 col-lg-6">
+        <div class="card-panel">
+            <div class="panel-header"><h5 class="panel-title"><i class="bi bi-droplet-fill text-primary me-2"></i>Información del Bautizo</h5></div>
+            <div class="detail-grid">
+                <div class="detail-item"><span class="detail-label">No. Boleta</span><code class="detail-value">@Model.NumeroBoleta</code></div>
+                <div class="detail-item"><span class="detail-label">Feligrés</span><span class="detail-value">@Model.Feligres?.NombreCompleto</span></div>
+                <div class="detail-item"><span class="detail-label">Fecha</span><span class="detail-value">@Model.FechaBautizo.ToString("dd MMMM yyyy")</span></div>
+                <div class="detail-item"><span class="detail-label">Sacerdote</span><span class="detail-value">@Model.Sacerdote</span></div>
+                <div class="detail-item"><span class="detail-label">Padrino</span><span class="detail-value">@(Model.PadrinoNombre ?? "—")</span></div>
+                <div class="detail-item"><span class="detail-label">Madrina</span><span class="detail-value">@(Model.MadrinaNombre ?? "—")</span></div>
+                <div class="detail-item"><span class="detail-label">Lugar</span><span class="detail-value">@(Model.LugarBautizo ?? "—")</span></div>
+                <div class="detail-item">
+                    <span class="detail-label">Estado</span>
+                    <span class="detail-value">
+                        <span class="badge @(Model.Estado == EstadoSolicitud.Completado ? "badge-success" : Model.Estado == EstadoSolicitud.Pendiente ? "badge-warning" : Model.Estado == EstadoSolicitud.Programado ? "badge-info" : "badge-danger")">
+                            @Model.Estado
+                        </span>
+                    </span>
+                </div>
+            </div>
+            @if (!string.IsNullOrEmpty(Model.Observaciones))
+            {
+                <hr>
+                <p class="text-muted small mb-0"><strong>Observaciones:</strong> @Model.Observaciones</p>
+            }
+        </div>
+    </div>
+    <div class="col-12 col-lg-6">
+        <div class="card-panel">
+            <div class="panel-header">
+                <h5 class="panel-title"><i class="bi bi-cash-coin text-success me-2"></i>Pago</h5>
+                @if (Model.Pago == null)
+                {
+                    <a href="/Pagos/Create" class="btn btn-sm btn-outline-success btn-icon">
+                        <i class="bi bi-plus"></i> Registrar pago
+                    </a>
+                }
+            </div>
+            @if (Model.Pago != null)
+            {
+                <div class="detail-grid">
+                    <div class="detail-item"><span class="detail-label">Referencia</span><code class="detail-value">@Model.Pago.Referencia</code></div>
+                    <div class="detail-item"><span class="detail-label">Monto</span><span class="detail-value text-success fw-600">$@Model.Pago.Monto.ToString("N2")</span></div>
+                    <div class="detail-item">
+                        <span class="detail-label">Estado</span>
+                        <span class="detail-value">
+                            <span class="badge @(Model.Pago.Estado == EstadoPago.Confirmado ? "badge-success" : Model.Pago.Estado == EstadoPago.Pendiente ? "badge-warning" : "badge-danger")">
+                                @Model.Pago.Estado
+                            </span>
+                        </span>
+                    </div>
+                </div>
+            }
+            else
+            {
+                <div class="empty-state-sm">
+                    <i class="bi bi-receipt"></i>
+                    <p>Sin pago registrado</p>
+                </div>
+            }
+        </div>
+    </div>
+</div>

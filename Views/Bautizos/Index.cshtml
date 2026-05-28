@@ -1,0 +1,124 @@
+@model IEnumerable<Bautizo>
+@{
+    ViewData["Title"] = "Bautizos";
+    string q = ViewBag.Query ?? "";
+    int page = ViewBag.Page;
+    int totalPages = ViewBag.TotalPages;
+    EstadoSolicitud? estado = ViewBag.Estado;
+}
+
+<div class="page-header">
+    <div>
+        <h1 class="page-title"><i class="bi bi-droplet-fill text-primary me-2"></i>Bautizos</h1>
+        <p class="page-desc">@ViewBag.Total registro(s)</p>
+    </div>
+    <a href="/Bautizos/Create" class="btn btn-primary btn-icon">
+        <i class="bi bi-plus-lg"></i> Nuevo Bautizo
+    </a>
+</div>
+
+<div class="card-panel mb-4">
+    <form method="get" class="row g-2 align-items-end">
+        <div class="col-12 col-md-6">
+            <div class="input-group">
+                <span class="input-group-text"><i class="bi bi-search"></i></span>
+                <input type="text" name="q" value="@q" class="form-control" placeholder="Buscar por nombre o boleta…" />
+            </div>
+        </div>
+        <div class="col-12 col-md-3">
+            <select name="estado" class="form-select">
+                <option value="">Todos los estados</option>
+                @foreach (EstadoSolicitud e in Enum.GetValues<EstadoSolicitud>())
+                {
+                    <option value="@((int)e)" selected="@(estado == e)">@e</option>
+                }
+            </select>
+        </div>
+        <div class="col-auto">
+            <button type="submit" class="btn btn-primary">Filtrar</button>
+            @if (!string.IsNullOrEmpty(q) || estado.HasValue)
+            {
+                <a href="/Bautizos" class="btn btn-outline-secondary ms-1">Limpiar</a>
+            }
+        </div>
+    </form>
+</div>
+
+@if (Model.Any())
+{
+    <div class="card-panel p-0">
+        <div class="table-responsive">
+            <table class="table table-hover data-table mb-0">
+                <thead>
+                    <tr>
+                        <th>Boleta</th><th>Feligrés</th><th>Fecha</th>
+                        <th>Sacerdote</th><th>Estado</th><th class="text-end">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var b in Model)
+                    {
+                        <tr>
+                            <td><code class="badge-code">@b.NumeroBoleta</code></td>
+                            <td>
+                                <div class="fw-500">@b.Feligres?.NombreCompleto</div>
+                                <small class="text-muted">@b.Feligres?.Comunidad</small>
+                            </td>
+                            <td>@b.FechaBautizo.ToString("dd/MM/yyyy")</td>
+                            <td>@b.Sacerdote</td>
+                            <td>
+                                <span class="badge @GetEstadoClass(b.Estado)">@b.Estado</span>
+                            </td>
+                            <td class="text-end">
+                                <div class="btn-group btn-group-sm">
+                                    <a href="/Bautizos/Details/@b.Id" class="btn btn-outline-secondary" aria-label="Ver"><i class="bi bi-eye"></i></a>
+                                    <a href="/Bautizos/Edit/@b.Id" class="btn btn-outline-primary" aria-label="Editar"><i class="bi bi-pencil"></i></a>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+    @if (totalPages > 1)
+    {
+        <nav class="mt-4 d-flex justify-content-center">
+            <ul class="pagination">
+                <li class="page-item @(page <= 1 ? "disabled" : "")">
+                    <a class="page-link" href="?q=@q&page=@(page-1)"><i class="bi bi-chevron-left"></i></a>
+                </li>
+                @for (int i = Math.Max(1, page - 2); i <= Math.Min(totalPages, page + 2); i++)
+                {
+                    <li class="page-item @(i == page ? "active" : "")">
+                        <a class="page-link" href="?q=@q&page=@i">@i</a>
+                    </li>
+                }
+                <li class="page-item @(page >= totalPages ? "disabled" : "")">
+                    <a class="page-link" href="?q=@q&page=@(page+1)"><i class="bi bi-chevron-right"></i></a>
+                </li>
+            </ul>
+        </nav>
+    }
+}
+else
+{
+    <div class="empty-state">
+        <div class="empty-icon text-primary"><i class="bi bi-droplet"></i></div>
+        <h3>Sin bautizos registrados</h3>
+        <p class="text-muted">Registra el primer bautizo de la parroquia.</p>
+        <a href="/Bautizos/Create" class="btn btn-primary btn-icon">
+            <i class="bi bi-plus-lg"></i> Nuevo Bautizo
+        </a>
+    </div>
+}
+
+@functions {
+    string GetEstadoClass(EstadoSolicitud e) => e switch {
+        EstadoSolicitud.Pendiente => "badge-warning",
+        EstadoSolicitud.Programado => "badge-info",
+        EstadoSolicitud.Completado => "badge-success",
+        EstadoSolicitud.Cancelado => "badge-danger",
+        _ => "badge-secondary"
+    };
+}
