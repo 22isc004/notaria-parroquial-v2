@@ -62,25 +62,30 @@ public class PagosController : Controller
     public async Task<IActionResult> Confirmar(int id)
     {
         var pago = await _db.Pagos.FindAsync(id);
-        if (pago == null) return NotFound();
+        if (pago == null)
+            return Json(new { success = false, mensaje = "Pago no encontrado." });
 
         pago.Estado = EstadoPago.Confirmado;
         pago.FechaPago = DateOnly.FromDateTime(DateTime.Today);
         await _db.SaveChangesAsync();
 
+        bool correoEnviado = false;
+        string mensaje = "Pago confirmado correctamente.";
+
         if (!string.IsNullOrEmpty(pago.EmailNotificacion))
         {
-            await _correo.EnviarConfirmacionPagoAsync(
+            correoEnviado = await _correo.EnviarConfirmacionPago(
                 pago.EmailNotificacion,
                 pago.NombreSolicitante,
-                pago.TipoServicio.ToString(),
                 pago.Referencia ?? "-",
-                pago.Monto,
-                pago.FechaPago.Value);
+                pago.Monto);
+
+            mensaje = correoEnviado
+                ? "Pago confirmado y correo enviado al feligrés."
+                : "Pago confirmado, pero el correo no pudo enviarse.";
         }
 
-        TempData["Toast"] = "success|Pago confirmado y correo enviado al feligrés.";
-        return RedirectToAction(nameof(Details), new { id });
+        return Json(new { success = true, correoEnviado, mensaje });
     }
 
     [HttpPost, ValidateAntiForgeryToken]

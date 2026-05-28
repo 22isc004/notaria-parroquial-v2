@@ -6,20 +6,21 @@
 <div class="page-header">
     <div>
         <h1 class="page-title">Detalle de Pago</h1>
-        <nav aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="/Pagos">Pagos</a></li><li class="breadcrumb-item active">@Model.Referencia</li></ol></nav>
+        <nav aria-label="breadcrumb"><ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="/Pagos">Pagos</a></li>
+            <li class="breadcrumb-item active">@Model.Referencia</li>
+        </ol></nav>
     </div>
     <div class="d-flex gap-2">
         @if (esPendiente)
         {
-            <form asp-action="Confirmar" asp-route-id="@Model.Id" method="post">
-                @Html.AntiForgeryToken()
-                <button type="submit" class="btn btn-success btn-icon"
-                        onclick="return confirm('¿Confirmar el pago y enviar correo al feligrés?')">
-                    <i class="bi bi-check-circle-fill"></i> Confirmar Pago
-                </button>
-            </form>
+            @Html.AntiForgeryToken()
+
+            <button id="btnConfirmar" class="btn btn-success btn-icon">
+                <i class="bi bi-check-circle-fill"></i> Confirmar Pago
+            </button>
+
             <form asp-action="Rechazar" asp-route-id="@Model.Id" method="post">
-                @Html.AntiForgeryToken()
                 <button type="submit" class="btn btn-outline-danger btn-icon"
                         onclick="return confirm('¿Rechazar este pago?')">
                     <i class="bi bi-x-circle"></i> Rechazar
@@ -32,7 +33,9 @@
 <div class="row g-4">
     <div class="col-12 col-lg-6">
         <div class="card-panel">
-            <div class="panel-header"><h5 class="panel-title"><i class="bi bi-receipt text-success me-2"></i>Información del Pago</h5></div>
+            <div class="panel-header">
+                <h5 class="panel-title"><i class="bi bi-receipt text-success me-2"></i>Información del Pago</h5>
+            </div>
             <div class="detail-grid">
                 <div class="detail-item"><span class="detail-label">Referencia</span><code class="detail-value">@Model.Referencia</code></div>
                 <div class="detail-item"><span class="detail-label">Solicitante</span><span class="detail-value">@Model.NombreSolicitante</span></div>
@@ -51,7 +54,9 @@
                 </div>
             </div>
             @if (!string.IsNullOrEmpty(Model.Notas))
-            { <hr><p class="text-muted small mb-0"><strong>Notas:</strong> @Model.Notas</p> }
+            {
+                <hr><p class="text-muted small mb-0"><strong>Notas:</strong> @Model.Notas</p>
+            }
         </div>
     </div>
     <div class="col-12 col-lg-6">
@@ -72,8 +77,51 @@
         <div class="card-panel mt-4">
             <div class="panel-header"><h5 class="panel-title">Registro</h5></div>
             <div class="detail-grid">
-                <div class="detail-item"><span class="detail-label">Fecha de registro</span><span class="detail-value">@Model.FechaRegistro.ToString("dd/MM/yyyy HH:mm")</span></div>
+                <div class="detail-item">
+                    <span class="detail-label">Fecha de registro</span>
+                    <span class="detail-value">@Model.FechaRegistro.ToString("dd/MM/yyyy HH:mm")</span>
+                </div>
             </div>
         </div>
     </div>
 </div>
+
+@if (esPendiente)
+{
+    @section Scripts {
+    <script>
+    document.getElementById('btnConfirmar').addEventListener('click', async () => {
+        if (!confirm('¿Confirmar el pago y enviar correo al feligrés?')) return;
+
+        const btn = document.getElementById('btnConfirmar');
+        btn.disabled = true;
+        btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span> Confirmando…';
+
+        const token = document.querySelector('input[name=__RequestVerificationToken]').value;
+        const formData = new FormData();
+        formData.append('__RequestVerificationToken', token);
+
+        try {
+            const res = await fetch('/Pagos/Confirmar/@Model.Id', {
+                method: 'POST',
+                body: formData
+            });
+            const data = await res.json();
+
+            if (data.success) {
+                // Reload so the view reflects the new Confirmado state
+                window.location.reload();
+            } else {
+                alert(data.mensaje ?? 'No se pudo confirmar el pago.');
+                btn.disabled = false;
+                btn.innerHTML = '<i class="bi bi-check-circle-fill"></i> Confirmar Pago';
+            }
+        } catch {
+            alert('Error de red al confirmar el pago.');
+            btn.disabled = false;
+            btn.innerHTML = '<i class="bi bi-check-circle-fill"></i> Confirmar Pago';
+        }
+    });
+    </script>
+    }
+}
