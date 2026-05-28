@@ -60,6 +60,7 @@ builder.Services.ConfigureApplicationCookie(o =>
 // ──────────────────────────────
 // Services
 // ──────────────────────────────
+builder.Services.AddHttpClient("Mailtrap");
 builder.Services.AddScoped<ICorreoServicio, CorreoServicio>();
 builder.Services.AddControllersWithViews();
 
