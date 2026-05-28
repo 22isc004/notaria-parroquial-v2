@@ -9,9 +9,10 @@ var builder = WebApplication.CreateBuilder(args);
 // ──────────────────────────────
 // Database
 // ──────────────────────────────
-var rawConn = Environment.GetEnvironmentVariable("DATABASE_URL")
-    ?? builder.Configuration.GetConnectionString("DefaultConnection")
-    ?? "Data Source=notaria.db";
+var databaseUrl = Environment.GetEnvironmentVariable("DATABASE_URL");
+var rawConn = !string.IsNullOrWhiteSpace(databaseUrl)
+    ? databaseUrl
+    : builder.Configuration.GetConnectionString("DefaultConnection") ?? "Data Source=notaria.db";
 
 bool usePostgres = rawConn.StartsWith("postgres", StringComparison.OrdinalIgnoreCase)
                 || rawConn.StartsWith("Host=", StringComparison.OrdinalIgnoreCase);
