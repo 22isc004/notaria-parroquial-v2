@@ -1,6 +1,7 @@
 @model Confirmacion
 @{
     ViewData["Title"] = "Nueva Confirmación";
+    var hoy = DateTime.Today.ToString("yyyy-MM-dd");
 }
 <div class="page-header">
     <div>
@@ -15,21 +16,55 @@
     <div class="col-12 col-lg-8">
         <div class="card-panel">
             <form asp-action="Create" method="post">
-                @Html.AntiForgeryToken()
                 <div class="form-section-title"><i class="bi bi-shield-fill-check me-2 text-warning"></i>Datos de la Confirmación</div>
                 <div class="row g-3">
                     <div class="col-12">
                         <label asp-for="FeligresId" class="form-label">Feligrés</label>
-                        <select asp-for="FeligresId" class="form-select" asp-items="ViewBag.FeligresList"><option value="">— Seleccionar feligrés —</option></select>
+                        <select asp-for="FeligresId" class="form-select" asp-items="ViewBag.FeligresList">
+                            <option value="">— Seleccionar feligrés —</option>
+                        </select>
                         <span asp-validation-for="FeligresId" class="text-danger small"></span>
+                        <div class="mt-1">
+                            <a href="/Feligreses/Create" target="_blank" class="small text-primary">
+                                <i class="bi bi-plus-circle me-1"></i>Registrar nuevo feligrés
+                            </a>
+                        </div>
                     </div>
-                    <div class="col-12 col-md-6"><label asp-for="FechaConfirmacion" class="form-label"></label><input asp-for="FechaConfirmacion" class="form-control" type="date" /><span asp-validation-for="FechaConfirmacion" class="text-danger small"></span></div>
-                    <div class="col-12 col-md-6"><label asp-for="Estado" class="form-label"></label><select asp-for="Estado" class="form-select" asp-items="Html.GetEnumSelectList<EstadoSolicitud>()"></select></div>
-                    <div class="col-12"><label asp-for="Sacerdote" class="form-label"></label><input asp-for="Sacerdote" class="form-control" placeholder="Sacerdote u Obispo" /><span asp-validation-for="Sacerdote" class="text-danger small"></span></div>
-                    <div class="col-12 col-md-6"><label asp-for="NombreConfirmacion" class="form-label"></label><input asp-for="NombreConfirmacion" class="form-control" placeholder="Nombre elegido" /></div>
-                    <div class="col-12 col-md-6"><label asp-for="PadrinoNombre" class="form-label"></label><input asp-for="PadrinoNombre" class="form-control" /></div>
-                    <div class="col-12"><label asp-for="Lugar" class="form-label"></label><input asp-for="Lugar" class="form-control" /></div>
-                    <div class="col-12"><label asp-for="Observaciones" class="form-label"></label><textarea asp-for="Observaciones" class="form-control" rows="3"></textarea></div>
+                    <div class="col-12 col-md-6">
+                        <label asp-for="FechaConfirmacion" class="form-label"></label>
+                        <input asp-for="FechaConfirmacion" class="form-control" type="date" min="@hoy" />
+                        <span asp-validation-for="FechaConfirmacion" class="text-danger small"></span>
+                    </div>
+                    <div class="col-12 col-md-6">
+                        <label asp-for="Estado" class="form-label"></label>
+                        <select asp-for="Estado" class="form-select" asp-items="Html.GetEnumSelectList<EstadoSolicitud>()"></select>
+                        <span asp-validation-for="Estado" class="text-danger small"></span>
+                    </div>
+                    <div class="col-12">
+                        <label asp-for="Sacerdote" class="form-label"></label>
+                        <input asp-for="Sacerdote" class="form-control" placeholder="Sacerdote u Obispo" />
+                        <span asp-validation-for="Sacerdote" class="text-danger small"></span>
+                    </div>
+                    <div class="col-12 col-md-6">
+                        <label asp-for="NombreConfirmacion" class="form-label"></label>
+                        <input asp-for="NombreConfirmacion" class="form-control" placeholder="Nombre elegido" />
+                        <span asp-validation-for="NombreConfirmacion" class="text-danger small"></span>
+                    </div>
+                    <div class="col-12 col-md-6">
+                        <label asp-for="PadrinoNombre" class="form-label"></label>
+                        <input asp-for="PadrinoNombre" class="form-control" placeholder="Nombre del padrino" />
+                        <span asp-validation-for="PadrinoNombre" class="text-danger small"></span>
+                    </div>
+                    <div class="col-12">
+                        <label asp-for="Lugar" class="form-label"></label>
+                        <input asp-for="Lugar" class="form-control" placeholder="Iglesia o lugar" />
+                        <span asp-validation-for="Lugar" class="text-danger small"></span>
+                    </div>
+                    <div class="col-12">
+                        <label asp-for="Observaciones" class="form-label"></label>
+                        <textarea asp-for="Observaciones" class="form-control" rows="3" placeholder="Notas adicionales…"></textarea>
+                        <span asp-validation-for="Observaciones" class="text-danger small"></span>
+                    </div>
                 </div>
                 <div class="form-actions mt-4">
                     <a href="/Confirmaciones" class="btn btn-outline-secondary">Cancelar</a>
@@ -39,3 +74,9 @@
         </div>
     </div>
 </div>
+
+@section Scripts {
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jquery-validation@1.19.5/dist/jquery.validate.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jquery-validation-unobtrusive@4.0.0/dist/jquery.validate.unobtrusive.min.js"></script>
+}

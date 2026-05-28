@@ -6,49 +6,56 @@ public class Feligres
 {
     public int Id { get; set; }
 
-    [Required, StringLength(80)]
+    [Required(ErrorMessage = "El nombre es requerido.")]
+    [StringLength(80, ErrorMessage = "El nombre no puede exceder 80 caracteres.")]
     [Display(Name = "Nombre(s)")]
     public string Nombre { get; set; } = string.Empty;
 
-    [Required, StringLength(80)]
+    [Required(ErrorMessage = "El apellido paterno es requerido.")]
+    [StringLength(80, ErrorMessage = "El apellido paterno no puede exceder 80 caracteres.")]
     [Display(Name = "Apellido Paterno")]
     public string ApellidoPaterno { get; set; } = string.Empty;
 
-    [StringLength(80)]
+    [StringLength(80, ErrorMessage = "El apellido materno no puede exceder 80 caracteres.")]
     [Display(Name = "Apellido Materno")]
     public string? ApellidoMaterno { get; set; }
 
-    [Required]
+    [Required(ErrorMessage = "La fecha de nacimiento es requerida.")]
+    [FechaNoFutura]
     [Display(Name = "Fecha de Nacimiento")]
     [DataType(DataType.Date)]
     public DateOnly FechaNacimiento { get; set; }
 
-    [Required]
+    [Required(ErrorMessage = "El género es requerido.")]
     [Display(Name = "Género")]
     public Genero Genero { get; set; }
 
-    [StringLength(18)]
+    [StringLength(18, MinimumLength = 18, ErrorMessage = "El CURP debe tener exactamente 18 caracteres.")]
+    [RegularExpression(@"^[A-Z]{4}\d{6}[HM][A-Z]{5}[0-9A-Z]\d$",
+        ErrorMessage = "El CURP no tiene el formato correcto.")]
     [Display(Name = "CURP")]
     public string? Curp { get; set; }
 
-    [StringLength(20)]
+    [RegularExpression(@"^\d{10}$", ErrorMessage = "El teléfono debe tener exactamente 10 dígitos.")]
     [Display(Name = "Teléfono")]
     public string? Telefono { get; set; }
 
-    [StringLength(150)]
-    [EmailAddress]
+    [StringLength(150, ErrorMessage = "El correo no puede exceder 150 caracteres.")]
+    [EmailAddress(ErrorMessage = "El correo electrónico no es válido.")]
     [Display(Name = "Correo Electrónico")]
     public string? Email { get; set; }
 
-    [StringLength(200)]
+    [StringLength(200, ErrorMessage = "La dirección no puede exceder 200 caracteres.")]
     [Display(Name = "Dirección")]
     public string? Direccion { get; set; }
 
-    [Required, StringLength(100)]
+    [Required(ErrorMessage = "La comunidad es requerida.")]
+    [StringLength(100, ErrorMessage = "La comunidad no puede exceder 100 caracteres.")]
     [Display(Name = "Comunidad")]
     public string Comunidad { get; set; } = string.Empty;
 
-    [StringLength(100)]
+    [Required(ErrorMessage = "El municipio es requerido.")]
+    [StringLength(100, ErrorMessage = "El municipio no puede exceder 100 caracteres.")]
     [Display(Name = "Municipio")]
     public string Municipio { get; set; } = "Axtla de Terrazas";
 
@@ -59,7 +66,6 @@ public class Feligres
 
     public string NombreCompleto => $"{Nombre} {ApellidoPaterno} {ApellidoMaterno}".Trim();
 
-    // Navigation
     public ICollection<Bautizo> Bautizos { get; set; } = new List<Bautizo>();
     public ICollection<PrimeraComunion> PrimerasComuniones { get; set; } = new List<PrimeraComunion>();
     public ICollection<Confirmacion> Confirmaciones { get; set; } = new List<Confirmacion>();

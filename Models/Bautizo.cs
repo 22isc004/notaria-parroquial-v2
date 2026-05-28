@@ -6,40 +6,42 @@ public class Bautizo
 {
     public int Id { get; set; }
 
-    [Required]
+    [Required(ErrorMessage = "Debe seleccionar un feligrés.")]
     [Display(Name = "Feligrés")]
     public int FeligresId { get; set; }
     public Feligres? Feligres { get; set; }
 
-    [Required]
+    [Required(ErrorMessage = "La fecha de bautizo es requerida.")]
+    [FechaNoAnterior]
     [Display(Name = "Fecha de Bautizo")]
     [DataType(DataType.Date)]
     public DateOnly FechaBautizo { get; set; }
 
-    [Required, StringLength(150)]
+    [Required(ErrorMessage = "El nombre del sacerdote es requerido.")]
+    [StringLength(150, ErrorMessage = "El nombre no puede exceder 150 caracteres.")]
     [Display(Name = "Sacerdote Celebrante")]
     public string Sacerdote { get; set; } = string.Empty;
 
-    [StringLength(150)]
+    [StringLength(150, ErrorMessage = "El nombre del padrino no puede exceder 150 caracteres.")]
     [Display(Name = "Nombre del Padrino")]
     public string? PadrinoNombre { get; set; }
 
-    [StringLength(150)]
+    [StringLength(150, ErrorMessage = "El nombre de la madrina no puede exceder 150 caracteres.")]
     [Display(Name = "Nombre de la Madrina")]
     public string? MadrinaNombre { get; set; }
 
-    [StringLength(200)]
+    [StringLength(200, ErrorMessage = "El lugar no puede exceder 200 caracteres.")]
     [Display(Name = "Lugar del Bautizo")]
     public string? LugarBautizo { get; set; }
 
-    [StringLength(30)]
+    [StringLength(30, ErrorMessage = "El número de boleta no puede exceder 30 caracteres.")]
     [Display(Name = "No. de Boleta")]
     public string? NumeroBoleta { get; set; }
 
     [Display(Name = "Estado")]
     public EstadoSolicitud Estado { get; set; } = EstadoSolicitud.Pendiente;
 
-    [StringLength(500)]
+    [StringLength(500, ErrorMessage = "Las observaciones no pueden exceder 500 caracteres.")]
     [Display(Name = "Observaciones")]
     public string? Observaciones { get; set; }
 
