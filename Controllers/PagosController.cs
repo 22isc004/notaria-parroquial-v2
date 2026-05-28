@@ -11,12 +11,12 @@ namespace NotariaParroquial.Controllers;
 public class PagosController : Controller
 {
     private readonly ApplicationDbContext _db;
-    private readonly IEmailService _email;
+    private readonly ICorreoServicio _correo;
 
-    public PagosController(ApplicationDbContext db, IEmailService email)
+    public PagosController(ApplicationDbContext db, ICorreoServicio correo)
     {
         _db = db;
-        _email = email;
+        _correo = correo;
     }
 
     public async Task<IActionResult> Index(string? q, EstadoPago? estado, int page = 1)
@@ -70,7 +70,7 @@ public class PagosController : Controller
 
         if (!string.IsNullOrEmpty(pago.EmailNotificacion))
         {
-            await _email.SendPaymentConfirmationAsync(
+            await _correo.EnviarConfirmacionPagoAsync(
                 pago.EmailNotificacion,
                 pago.NombreSolicitante,
                 pago.TipoServicio.ToString(),
