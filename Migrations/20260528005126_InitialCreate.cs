@@ -1,5 +1,6 @@
-﻿using System;
+using System;
 using Microsoft.EntityFrameworkCore.Migrations;
+using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
@@ -32,22 +33,22 @@ namespace NotariaParroquial.Migrations
                     Id = table.Column<string>(type: "TEXT", nullable: false),
                     NombreCompleto = table.Column<string>(type: "TEXT", nullable: false),
                     Rol = table.Column<string>(type: "TEXT", nullable: false),
-                    FechaCreacion = table.Column<DateTime>(type: "TEXT", nullable: false),
-                    Activo = table.Column<bool>(type: "INTEGER", nullable: false),
+                    FechaCreacion = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    Activo = table.Column<bool>(type: "boolean", nullable: false),
                     UserName = table.Column<string>(type: "TEXT", maxLength: 256, nullable: true),
                     NormalizedUserName = table.Column<string>(type: "TEXT", maxLength: 256, nullable: true),
                     Email = table.Column<string>(type: "TEXT", maxLength: 256, nullable: true),
                     NormalizedEmail = table.Column<string>(type: "TEXT", maxLength: 256, nullable: true),
-                    EmailConfirmed = table.Column<bool>(type: "INTEGER", nullable: false),
+                    EmailConfirmed = table.Column<bool>(type: "boolean", nullable: false),
                     PasswordHash = table.Column<string>(type: "TEXT", nullable: true),
                     SecurityStamp = table.Column<string>(type: "TEXT", nullable: true),
                     ConcurrencyStamp = table.Column<string>(type: "TEXT", nullable: true),
                     PhoneNumber = table.Column<string>(type: "TEXT", nullable: true),
-                    PhoneNumberConfirmed = table.Column<bool>(type: "INTEGER", nullable: false),
-                    TwoFactorEnabled = table.Column<bool>(type: "INTEGER", nullable: false),
-                    LockoutEnd = table.Column<DateTimeOffset>(type: "TEXT", nullable: true),
-                    LockoutEnabled = table.Column<bool>(type: "INTEGER", nullable: false),
-                    AccessFailedCount = table.Column<int>(type: "INTEGER", nullable: false)
+                    PhoneNumberConfirmed = table.Column<bool>(type: "boolean", nullable: false),
+                    TwoFactorEnabled = table.Column<bool>(type: "boolean", nullable: false),
+                    LockoutEnd = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
+                    LockoutEnabled = table.Column<bool>(type: "boolean", nullable: false),
+                    AccessFailedCount = table.Column<int>(type: "integer", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -58,21 +59,22 @@ namespace NotariaParroquial.Migrations
                 name: "Feligreses",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "INTEGER", nullable: false)
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn)
                         .Annotation("Sqlite:Autoincrement", true),
                     Nombre = table.Column<string>(type: "TEXT", maxLength: 80, nullable: false),
                     ApellidoPaterno = table.Column<string>(type: "TEXT", maxLength: 80, nullable: false),
                     ApellidoMaterno = table.Column<string>(type: "TEXT", maxLength: 80, nullable: true),
-                    FechaNacimiento = table.Column<DateOnly>(type: "TEXT", nullable: false),
-                    Genero = table.Column<int>(type: "INTEGER", nullable: false),
+                    FechaNacimiento = table.Column<DateOnly>(type: "date", nullable: false),
+                    Genero = table.Column<int>(type: "integer", nullable: false),
                     Curp = table.Column<string>(type: "TEXT", maxLength: 18, nullable: true),
                     Telefono = table.Column<string>(type: "TEXT", maxLength: 20, nullable: true),
                     Email = table.Column<string>(type: "TEXT", maxLength: 150, nullable: true),
                     Direccion = table.Column<string>(type: "TEXT", maxLength: 200, nullable: true),
                     Comunidad = table.Column<string>(type: "TEXT", maxLength: 100, nullable: false),
                     Municipio = table.Column<string>(type: "TEXT", maxLength: 100, nullable: false),
-                    FechaRegistro = table.Column<DateTime>(type: "TEXT", nullable: false),
-                    IsDeleted = table.Column<bool>(type: "INTEGER", nullable: false)
+                    FechaRegistro = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    IsDeleted = table.Column<bool>(type: "boolean", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -83,19 +85,20 @@ namespace NotariaParroquial.Migrations
                 name: "Pagos",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "INTEGER", nullable: false)
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn)
                         .Annotation("Sqlite:Autoincrement", true),
-                    TipoServicio = table.Column<int>(type: "INTEGER", nullable: false),
+                    TipoServicio = table.Column<int>(type: "integer", nullable: false),
                     NombreSolicitante = table.Column<string>(type: "TEXT", maxLength: 200, nullable: false),
                     EmailNotificacion = table.Column<string>(type: "TEXT", maxLength: 150, nullable: true),
                     Monto = table.Column<decimal>(type: "decimal(10,2)", nullable: false),
-                    FechaPago = table.Column<DateOnly>(type: "TEXT", nullable: true),
-                    MetodoPago = table.Column<int>(type: "INTEGER", nullable: false),
-                    Estado = table.Column<int>(type: "INTEGER", nullable: false),
+                    FechaPago = table.Column<DateOnly>(type: "date", nullable: true),
+                    MetodoPago = table.Column<int>(type: "integer", nullable: false),
+                    Estado = table.Column<int>(type: "integer", nullable: false),
                     Referencia = table.Column<string>(type: "TEXT", maxLength: 100, nullable: true),
                     Notas = table.Column<string>(type: "TEXT", maxLength: 500, nullable: true),
-                    FechaRegistro = table.Column<DateTime>(type: "TEXT", nullable: false),
-                    IsDeleted = table.Column<bool>(type: "INTEGER", nullable: false)
+                    FechaRegistro = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    IsDeleted = table.Column<bool>(type: "boolean", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -106,7 +109,8 @@ namespace NotariaParroquial.Migrations
                 name: "AspNetRoleClaims",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "INTEGER", nullable: false)
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn)
                         .Annotation("Sqlite:Autoincrement", true),
                     RoleId = table.Column<string>(type: "TEXT", nullable: false),
                     ClaimType = table.Column<string>(type: "TEXT", nullable: true),
@@ -127,7 +131,8 @@ namespace NotariaParroquial.Migrations
                 name: "AspNetUserClaims",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "INTEGER", nullable: false)
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn)
                         .Annotation("Sqlite:Autoincrement", true),
                     UserId = table.Column<string>(type: "TEXT", nullable: false),
                     ClaimType = table.Column<string>(type: "TEXT", nullable: true),
@@ -212,20 +217,21 @@ namespace NotariaParroquial.Migrations
                 name: "Bautizos",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "INTEGER", nullable: false)
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn)
                         .Annotation("Sqlite:Autoincrement", true),
-                    FeligresId = table.Column<int>(type: "INTEGER", nullable: false),
-                    FechaBautizo = table.Column<DateOnly>(type: "TEXT", nullable: false),
+                    FeligresId = table.Column<int>(type: "integer", nullable: false),
+                    FechaBautizo = table.Column<DateOnly>(type: "date", nullable: false),
                     Sacerdote = table.Column<string>(type: "TEXT", maxLength: 150, nullable: false),
                     PadrinoNombre = table.Column<string>(type: "TEXT", maxLength: 150, nullable: true),
                     MadrinaNombre = table.Column<string>(type: "TEXT", maxLength: 150, nullable: true),
                     LugarBautizo = table.Column<string>(type: "TEXT", maxLength: 200, nullable: true),
                     NumeroBoleta = table.Column<string>(type: "TEXT", maxLength: 30, nullable: true),
-                    Estado = table.Column<int>(type: "INTEGER", nullable: false),
+                    Estado = table.Column<int>(type: "integer", nullable: false),
                     Observaciones = table.Column<string>(type: "TEXT", maxLength: 500, nullable: true),
-                    FechaRegistro = table.Column<DateTime>(type: "TEXT", nullable: false),
-                    IsDeleted = table.Column<bool>(type: "INTEGER", nullable: false),
-                    PagoId = table.Column<int>(type: "INTEGER", nullable: true)
+                    FechaRegistro = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    IsDeleted = table.Column<bool>(type: "boolean", nullable: false),
+                    PagoId = table.Column<int>(type: "integer", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -248,20 +254,21 @@ namespace NotariaParroquial.Migrations
                 name: "Confirmaciones",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "INTEGER", nullable: false)
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn)
                         .Annotation("Sqlite:Autoincrement", true),
-                    FeligresId = table.Column<int>(type: "INTEGER", nullable: false),
-                    FechaConfirmacion = table.Column<DateOnly>(type: "TEXT", nullable: false),
+                    FeligresId = table.Column<int>(type: "integer", nullable: false),
+                    FechaConfirmacion = table.Column<DateOnly>(type: "date", nullable: false),
                     Sacerdote = table.Column<string>(type: "TEXT", maxLength: 150, nullable: false),
                     NombreConfirmacion = table.Column<string>(type: "TEXT", maxLength: 100, nullable: true),
                     PadrinoNombre = table.Column<string>(type: "TEXT", maxLength: 150, nullable: true),
                     Lugar = table.Column<string>(type: "TEXT", maxLength: 200, nullable: true),
                     NumeroBoleta = table.Column<string>(type: "TEXT", maxLength: 30, nullable: true),
-                    Estado = table.Column<int>(type: "INTEGER", nullable: false),
+                    Estado = table.Column<int>(type: "integer", nullable: false),
                     Observaciones = table.Column<string>(type: "TEXT", maxLength: 500, nullable: true),
-                    FechaRegistro = table.Column<DateTime>(type: "TEXT", nullable: false),
-                    IsDeleted = table.Column<bool>(type: "INTEGER", nullable: false),
-                    PagoId = table.Column<int>(type: "INTEGER", nullable: true)
+                    FechaRegistro = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    IsDeleted = table.Column<bool>(type: "boolean", nullable: false),
+                    PagoId = table.Column<int>(type: "integer", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -284,21 +291,22 @@ namespace NotariaParroquial.Migrations
                 name: "Matrimonios",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "INTEGER", nullable: false)
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn)
                         .Annotation("Sqlite:Autoincrement", true),
                     Contrayente1Nombre = table.Column<string>(type: "TEXT", maxLength: 150, nullable: false),
                     Contrayente2Nombre = table.Column<string>(type: "TEXT", maxLength: 150, nullable: false),
-                    FechaMatrimonio = table.Column<DateOnly>(type: "TEXT", nullable: false),
+                    FechaMatrimonio = table.Column<DateOnly>(type: "date", nullable: false),
                     Sacerdote = table.Column<string>(type: "TEXT", maxLength: 150, nullable: false),
                     Testigo1 = table.Column<string>(type: "TEXT", maxLength: 150, nullable: true),
                     Testigo2 = table.Column<string>(type: "TEXT", maxLength: 150, nullable: true),
                     Lugar = table.Column<string>(type: "TEXT", maxLength: 200, nullable: true),
                     NumeroActa = table.Column<string>(type: "TEXT", maxLength: 30, nullable: true),
-                    Estado = table.Column<int>(type: "INTEGER", nullable: false),
+                    Estado = table.Column<int>(type: "integer", nullable: false),
                     Observaciones = table.Column<string>(type: "TEXT", maxLength: 500, nullable: true),
-                    FechaRegistro = table.Column<DateTime>(type: "TEXT", nullable: false),
-                    IsDeleted = table.Column<bool>(type: "INTEGER", nullable: false),
-                    PagoId = table.Column<int>(type: "INTEGER", nullable: true)
+                    FechaRegistro = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    IsDeleted = table.Column<bool>(type: "boolean", nullable: false),
+                    PagoId = table.Column<int>(type: "integer", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -315,20 +323,21 @@ namespace NotariaParroquial.Migrations
                 name: "PrimerasComuniones",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "INTEGER", nullable: false)
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn)
                         .Annotation("Sqlite:Autoincrement", true),
-                    FeligresId = table.Column<int>(type: "INTEGER", nullable: false),
-                    FechaComunion = table.Column<DateOnly>(type: "TEXT", nullable: false),
+                    FeligresId = table.Column<int>(type: "integer", nullable: false),
+                    FechaComunion = table.Column<DateOnly>(type: "date", nullable: false),
                     Sacerdote = table.Column<string>(type: "TEXT", maxLength: 150, nullable: false),
                     PadrinoNombre = table.Column<string>(type: "TEXT", maxLength: 150, nullable: true),
                     MadrinaNombre = table.Column<string>(type: "TEXT", maxLength: 150, nullable: true),
                     Lugar = table.Column<string>(type: "TEXT", maxLength: 200, nullable: true),
                     NumeroBoleta = table.Column<string>(type: "TEXT", maxLength: 30, nullable: true),
-                    Estado = table.Column<int>(type: "INTEGER", nullable: false),
+                    Estado = table.Column<int>(type: "integer", nullable: false),
                     Observaciones = table.Column<string>(type: "TEXT", maxLength: 500, nullable: true),
-                    FechaRegistro = table.Column<DateTime>(type: "TEXT", nullable: false),
-                    IsDeleted = table.Column<bool>(type: "INTEGER", nullable: false),
-                    PagoId = table.Column<int>(type: "INTEGER", nullable: true)
+                    FechaRegistro = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    IsDeleted = table.Column<bool>(type: "boolean", nullable: false),
+                    PagoId = table.Column<int>(type: "integer", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -427,44 +436,19 @@ namespace NotariaParroquial.Migrations
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropTable(
-                name: "AspNetRoleClaims");
-
-            migrationBuilder.DropTable(
-                name: "AspNetUserClaims");
-
-            migrationBuilder.DropTable(
-                name: "AspNetUserLogins");
-
-            migrationBuilder.DropTable(
-                name: "AspNetUserRoles");
-
-            migrationBuilder.DropTable(
-                name: "AspNetUserTokens");
-
-            migrationBuilder.DropTable(
-                name: "Bautizos");
-
-            migrationBuilder.DropTable(
-                name: "Confirmaciones");
-
-            migrationBuilder.DropTable(
-                name: "Matrimonios");
-
-            migrationBuilder.DropTable(
-                name: "PrimerasComuniones");
-
-            migrationBuilder.DropTable(
-                name: "AspNetRoles");
-
-            migrationBuilder.DropTable(
-                name: "AspNetUsers");
-
-            migrationBuilder.DropTable(
-                name: "Feligreses");
-
-            migrationBuilder.DropTable(
-                name: "Pagos");
+            migrationBuilder.DropTable(name: "AspNetRoleClaims");
+            migrationBuilder.DropTable(name: "AspNetUserClaims");
+            migrationBuilder.DropTable(name: "AspNetUserLogins");
+            migrationBuilder.DropTable(name: "AspNetUserRoles");
+            migrationBuilder.DropTable(name: "AspNetUserTokens");
+            migrationBuilder.DropTable(name: "Bautizos");
+            migrationBuilder.DropTable(name: "Confirmaciones");
+            migrationBuilder.DropTable(name: "Matrimonios");
+            migrationBuilder.DropTable(name: "PrimerasComuniones");
+            migrationBuilder.DropTable(name: "AspNetRoles");
+            migrationBuilder.DropTable(name: "AspNetUsers");
+            migrationBuilder.DropTable(name: "Feligreses");
+            migrationBuilder.DropTable(name: "Pagos");
         }
     }
 }

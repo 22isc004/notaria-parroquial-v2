@@ -74,6 +74,30 @@ using (var scope = app.Services.CreateScope())
     var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
     var logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
 
+    // If PostgreSQL tables already exist with wrong SQLite-generated types (e.g. Activo=integer
+    // instead of boolean), force a full schema reset before running migration.
+    if (usePostgres)
+    {
+        try
+        {
+            var conn = db.Database.GetDbConnection();
+            if (conn.State != System.Data.ConnectionState.Open) await conn.OpenAsync();
+            using var cmd = conn.CreateCommand();
+            cmd.CommandText = "SELECT data_type FROM information_schema.columns " +
+                              "WHERE table_schema='public' AND table_name='AspNetUsers' AND column_name='Activo'";
+            var colType = await cmd.ExecuteScalarAsync() as string;
+            if (conn.State == System.Data.ConnectionState.Open) await conn.CloseAsync();
+
+            if (colType == "integer")
+            {
+                logger.LogWarning("Wrong column types detected (bool stored as integer) — resetting schema.");
+                db.Database.ExecuteSqlRaw("DROP SCHEMA IF EXISTS public CASCADE");
+                db.Database.ExecuteSqlRaw("CREATE SCHEMA public");
+            }
+        }
+        catch { /* table doesn't exist yet — migration will create it correctly */ }
+    }
+
     try
     {
         db.Database.Migrate();
