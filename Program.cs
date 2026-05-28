@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using NotariaParroquial.Data;
 using NotariaParroquial.Models;
 using NotariaParroquial.Services;
+using Resend;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -60,7 +61,10 @@ builder.Services.ConfigureApplicationCookie(o =>
 // ──────────────────────────────
 // Services
 // ──────────────────────────────
-builder.Services.AddHttpClient("MailerSend");
+builder.Services.AddResend(o =>
+{
+    o.ApiToken = builder.Configuration["Resend:ApiKey"] ?? string.Empty;
+});
 builder.Services.AddScoped<ICorreoServicio, CorreoServicio>();
 builder.Services.AddControllersWithViews();
 

@@ -1,20 +1,15 @@
-using System.Net.Http.Headers;
-using System.Text;
-using System.Text.Json;
+using Resend;
 
 namespace NotariaParroquial.Services;
 
 public class CorreoServicio : ICorreoServicio
 {
-    private readonly IHttpClientFactory _httpFactory;
-    private readonly IConfiguration _config;
+    private readonly IResend _resend;
     private readonly ILogger<CorreoServicio> _logger;
 
-    public CorreoServicio(IHttpClientFactory httpFactory, IConfiguration config,
-        ILogger<CorreoServicio> logger)
+    public CorreoServicio(IResend resend, ILogger<CorreoServicio> logger)
     {
-        _httpFactory = httpFactory;
-        _config = config;
+        _resend = resend;
         _logger = logger;
     }
 
@@ -29,36 +24,18 @@ public class CorreoServicio : ICorreoServicio
 
         try
         {
-            var apiToken = _config["MailerSend:ApiToken"]!;
-            var baseUrl = (_config["MailerSend:ApiBaseUrl"] ?? "https://api.mailersend.com/v1/").TrimEnd('/');
-
-            var payload = new
+            var message = new EmailMessage
             {
-                from = new { email = "noreply@sneackersstore.com", name = "Sneackers Store" },
-                to = new[] { new { email = emailCliente, name = nombreCliente } },
-                subject = $"Pedido #{numeroPedido} Confirmado - Sneackers Store",
-                html = BuildHtml(nombreCliente, numeroPedido, total)
+                From = "onboarding@resend.dev",
+                To = emailCliente,
+                Subject = $"Pedido #{numeroPedido} Confirmado - Sneackers Store",
+                HtmlBody = BuildHtml(nombreCliente, numeroPedido, total)
             };
 
-            var http = _httpFactory.CreateClient("MailerSend");
-            http.DefaultRequestHeaders.Authorization =
-                new AuthenticationHeaderValue("Bearer", apiToken);
-
-            var content = new StringContent(
-                JsonSerializer.Serialize(payload), Encoding.UTF8, "application/json");
-
-            var response = await http.PostAsync($"{baseUrl}/email", content);
-
-            if (response.IsSuccessStatusCode)
-            {
-                _logger.LogInformation("Correo enviado a {Email} — pedido {Pedido}",
-                    emailCliente, numeroPedido);
-                return true;
-            }
-
-            var body = await response.Content.ReadAsStringAsync();
-            _logger.LogError("MailerSend respondió {Status}: {Body}", response.StatusCode, body);
-            return false;
+            await _resend.EmailSendAsync(message);
+            _logger.LogInformation("Correo enviado a {Email} — pedido {Pedido}",
+                emailCliente, numeroPedido);
+            return true;
         }
         catch (Exception ex)
         {
@@ -86,7 +63,7 @@ public class CorreoServicio : ICorreoServicio
 
                 <!-- Header -->
                 <tr>
-                  <td style="background:linear-gradient(135deg,#198754,#157347);
+                  <td style="background:linear-gradient(135deg,#6366f1,#8b5cf6);
                              padding:40px 32px;text-align:center;">
                     <p style="color:rgba(255,255,255,.8);margin:0 0 8px;font-size:13px;
                                letter-spacing:2px;text-transform:uppercase;">Sneackers Store</p>
@@ -107,12 +84,12 @@ public class CorreoServicio : ICorreoServicio
                     </h2>
                     <p style="color:#6c757d;margin:0;font-size:15px;line-height:1.7;">
                       Hemos recibido y confirmado tu pago correctamente.
-                      A continuación encontrarás el resumen de tu pedido.
+                      A continuación el resumen de tu pedido.
                     </p>
                   </td>
                 </tr>
 
-                <!-- Order summary card -->
+                <!-- Order card -->
                 <tr>
                   <td style="padding:24px 32px;">
                     <table width="100%" cellpadding="0" cellspacing="0"
@@ -129,22 +106,16 @@ public class CorreoServicio : ICorreoServicio
                       </tr>
                       <tr>
                         <td style="padding:14px 20px;border-bottom:1px solid #dee2e6;
-                                   color:#6c757d;font-size:14px;width:40%;">
-                          N° de Pedido
-                        </td>
+                                   color:#6c757d;font-size:14px;width:40%;">N° de Pedido</td>
                         <td style="padding:14px 20px;border-bottom:1px solid #dee2e6;
                                    color:#212529;font-size:14px;font-weight:600;
-                                   font-family:monospace;">
-                          {numeroPedido}
-                        </td>
+                                   font-family:monospace;">{numeroPedido}</td>
                       </tr>
                       <tr>
                         <td style="padding:14px 20px;border-bottom:1px solid #dee2e6;
-                                   color:#6c757d;font-size:14px;">
-                          Estado
-                        </td>
+                                   color:#6c757d;font-size:14px;">Estado</td>
                         <td style="padding:14px 20px;border-bottom:1px solid #dee2e6;">
-                          <span style="background:#d1e7dd;color:#0f5132;padding:4px 12px;
+                          <span style="background:#ede9fe;color:#5b21b6;padding:4px 12px;
                                        border-radius:50px;font-size:13px;font-weight:600;">
                             ✓ Confirmado
                           </span>
@@ -154,7 +125,7 @@ public class CorreoServicio : ICorreoServicio
                         <td style="padding:16px 20px;color:#6c757d;font-size:14px;">
                           Total Pagado
                         </td>
-                        <td style="padding:16px 20px;color:#198754;
+                        <td style="padding:16px 20px;color:#6366f1;
                                    font-size:26px;font-weight:700;">
                           ${total:N2} MXN
                         </td>
@@ -163,35 +134,26 @@ public class CorreoServicio : ICorreoServicio
                   </td>
                 </tr>
 
-                <!-- Thank you banner -->
+                <!-- Thank you -->
                 <tr>
                   <td style="padding:0 32px 32px;">
-                    <table width="100%" cellpadding="0" cellspacing="0"
-                           style="background:#d1e7dd;border-radius:8px;">
-                      <tr>
-                        <td style="padding:20px 24px;">
-                          <p style="color:#0f5132;margin:0 0 6px;font-size:15px;
-                                     font-weight:600;">
-                            ¡Gracias por tu compra!
-                          </p>
-                          <p style="color:#0f5132;margin:0;font-size:14px;line-height:1.6;">
-                            Pronto recibirás más información sobre el estado de tu envío.
-                            Si tienes alguna duda, no dudes en contactarnos.
-                          </p>
-                        </td>
-                      </tr>
-                    </table>
+                    <div style="background:#ede9fe;border-left:4px solid #6366f1;
+                                border-radius:4px;padding:16px 20px;">
+                      <p style="color:#4c1d95;margin:0;font-size:14px;line-height:1.6;">
+                        <strong>¡Gracias por tu compra!</strong> Pronto recibirás
+                        información sobre el envío. Para cualquier duda escríbenos
+                        respondiendo este correo.
+                      </p>
+                    </div>
                   </td>
                 </tr>
 
-                <!-- Divider -->
+                <!-- Divider + Footer -->
                 <tr>
                   <td style="padding:0 32px;">
                     <hr style="border:none;border-top:1px solid #dee2e6;margin:0;">
                   </td>
                 </tr>
-
-                <!-- Footer -->
                 <tr>
                   <td style="padding:24px 32px;text-align:center;">
                     <p style="color:#adb5bd;font-size:12px;margin:0 0 4px;">
