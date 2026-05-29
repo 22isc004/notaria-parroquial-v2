@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"]</title>
+    <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'EB Garamond', Georgia, serif;
+            background: #f0ece4;
+            color: #1a1a1a;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 32px 16px 64px;
+        }
+
+        /* ── Toolbar (only on screen) ── */
+        .acta-toolbar {
+            width: 100%;
+            max-width: 780px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .btn-back {
+            font-family: 'Inter', sans-serif;
+            font-size: .85rem;
+            color: #555;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .btn-back:hover { color: #111; }
+        .btn-print {
+            font-family: 'Inter', sans-serif;
+            font-size: .875rem;
+            font-weight: 500;
+            background: #2d5016;
+            color: #fff;
+            border: none;
+            border-radius: 6px;
+            padding: 9px 20px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: background .15s;
+        }
+        .btn-print:hover { background: #1e3a0f; }
+
+        /* ── Acta paper ── */
+        .acta-paper {
+            width: 100%;
+            max-width: 780px;
+            background: #fff;
+            border: 1px solid #d6cfc3;
+            box-shadow: 0 4px 24px rgba(0,0,0,.12);
+            padding: 56px 64px 64px;
+            position: relative;
+        }
+
+        /* Decorative border */
+        .acta-paper::before {
+            content: '';
+            position: absolute;
+            inset: 12px;
+            border: 1.5px solid #b8a97a;
+            pointer-events: none;
+        }
+
+        /* ── Header ── */
+        .acta-header {
+            text-align: center;
+            margin-bottom: 36px;
+            padding-bottom: 24px;
+            border-bottom: 2px solid #b8a97a;
+        }
+        .acta-church-name {
+            font-size: 1.05rem;
+            font-weight: 600;
+            letter-spacing: .12em;
+            text-transform: uppercase;
+            color: #2d5016;
+        }
+        .acta-parish {
+            font-size: .9rem;
+            color: #666;
+            margin-top: 2px;
+            font-style: italic;
+        }
+        .acta-cross {
+            font-size: 2rem;
+            color: #b8a97a;
+            margin: 14px 0 10px;
+            line-height: 1;
+        }
+        .acta-title {
+            font-size: 1.6rem;
+            font-weight: 700;
+            letter-spacing: .08em;
+            text-transform: uppercase;
+            color: #1a1a1a;
+            margin-top: 6px;
+        }
+        .acta-folio {
+            display: inline-block;
+            margin-top: 10px;
+            font-family: 'Inter', sans-serif;
+            font-size: .78rem;
+            font-weight: 600;
+            letter-spacing: .1em;
+            background: #2d5016;
+            color: #fff;
+            padding: 3px 12px;
+            border-radius: 4px;
+        }
+
+        /* ── Body text ── */
+        .acta-body {
+            font-size: 1.05rem;
+            line-height: 1.85;
+            color: #222;
+            margin-bottom: 32px;
+            text-align: justify;
+        }
+        .acta-body strong { font-weight: 600; }
+
+        /* ── Data table ── */
+        .acta-fields {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 28px 0;
+            font-size: .97rem;
+        }
+        .acta-fields tr { border-bottom: 1px dotted #ccc; }
+        .acta-fields td {
+            padding: 8px 4px;
+            vertical-align: top;
+        }
+        .acta-fields td:first-child {
+            width: 38%;
+            font-weight: 600;
+            color: #555;
+            font-size: .88rem;
+            letter-spacing: .04em;
+            text-transform: uppercase;
+            font-family: 'Inter', sans-serif;
+            padding-right: 16px;
+        }
+
+        /* ── Signatures ── */
+        .acta-signatures {
+            display: flex;
+            justify-content: space-around;
+            gap: 32px;
+            margin-top: 56px;
+        }
+        .sign-block {
+            flex: 1;
+            text-align: center;
+        }
+        .sign-line {
+            border-top: 1.5px solid #222;
+            margin-bottom: 8px;
+        }
+        .sign-label {
+            font-size: .82rem;
+            color: #555;
+            font-family: 'Inter', sans-serif;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: .06em;
+        }
+
+        /* ── Footer ── */
+        .acta-footer {
+            text-align: center;
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid #ddd;
+            font-size: .82rem;
+            color: #999;
+            font-family: 'Inter', sans-serif;
+            font-style: italic;
+        }
+
+        /* ── Print styles ── */
+        @@media print {
+            body { background: white; padding: 0; }
+            .acta-toolbar { display: none; }
+            .acta-paper {
+                box-shadow: none;
+                border: none;
+                max-width: 100%;
+                padding: 20mm 20mm 25mm;
+            }
+            .acta-paper::before { inset: 8mm; }
+            @@page { size: A4; margin: 0; }
+        }
+    </style>
+</head>
+<body>
+    <div class="acta-toolbar">
+        <a href="javascript:history.back()" class="btn-back">
+            &#8592; Volver
+        </a>
+        <button class="btn-print" onclick="window.print()">
+            &#128438; Imprimir Acta
+        </button>
+    </div>
+
+    @RenderBody()
+</body>
+</html>

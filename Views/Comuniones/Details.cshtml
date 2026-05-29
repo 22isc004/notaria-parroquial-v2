@@ -10,7 +10,12 @@
             <li class="breadcrumb-item active">@Model.NumeroBoleta</li>
         </ol></nav>
     </div>
-    <a href="/Comuniones/Edit/@Model.Id" class="btn btn-primary btn-icon"><i class="bi bi-pencil"></i> Editar</a>
+    <div class="d-flex gap-2">
+        <a href="/Comuniones/Acta/@Model.Id" target="_blank" class="btn btn-outline-secondary btn-icon">
+            <i class="bi bi-printer-fill"></i> Imprimir Acta
+        </a>
+        <a href="/Comuniones/Edit/@Model.Id" class="btn btn-primary btn-icon"><i class="bi bi-pencil"></i> Editar</a>
+    </div>
 </div>
 <div class="row g-4">
     <div class="col-12 col-lg-8">

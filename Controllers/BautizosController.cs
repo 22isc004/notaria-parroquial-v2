@@ -83,6 +83,14 @@ public class BautizosController : Controller
         return View(item);
     }
 
+    public async Task<IActionResult> Acta(int id)
+    {
+        var item = await _db.Bautizos.Include(b => b.Feligres)
+            .FirstOrDefaultAsync(b => b.Id == id);
+        if (item == null) return NotFound();
+        return View(item);
+    }
+
     [HttpPost, ValidateAntiForgeryToken, Authorize(Roles = "Administrador")]
     public async Task<IActionResult> Delete(int id)
     {

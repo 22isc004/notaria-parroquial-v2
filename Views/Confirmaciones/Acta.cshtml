@@ -1,0 +1,69 @@
+@model Confirmacion
+@{
+    Layout = "~/Views/Shared/_ActaLayout.cshtml";
+    ViewData["Title"] = $"Acta de Confirmación — {Model.NumeroBoleta}";
+    var feligres = Model.Feligres;
+    var fechaConf = Model.FechaConfirmacion.ToString("dd 'de' MMMM 'de' yyyy", new System.Globalization.CultureInfo("es-MX"));
+    var fechaNac = feligres?.FechaNacimiento.ToString("dd 'de' MMMM 'de' yyyy", new System.Globalization.CultureInfo("es-MX")) ?? "—";
+}
+
+<article class="acta-paper">
+    <header class="acta-header">
+        <div class="acta-church-name">Notaría Parroquial</div>
+        <div class="acta-parish">Parroquia de Axtla de Terrazas, S.L.P.</div>
+        <div class="acta-cross">&#10013;</div>
+        <div class="acta-title">Acta de Confirmación</div>
+        <span class="acta-folio">@Model.NumeroBoleta</span>
+    </header>
+
+    <div class="acta-body">
+        El suscrito Párroco certifica que en los registros de esta Parroquia consta que el día
+        <strong>@fechaConf</strong>, recibió el Sacramento de la Confirmación:
+        <br><br>
+        <strong>@(feligres?.NombreCompleto ?? "—")</strong>
+        @if (!string.IsNullOrWhiteSpace(Model.NombreConfirmacion))
+        {
+            <text>, adoptando el nombre de confirmación <strong>@Model.NombreConfirmacion</strong></text>
+        },
+        @if (feligres != null)
+        {
+            <text>nacido/a el <strong>@fechaNac</strong>, originario/a de <strong>@feligres.Comunidad, @feligres.Municipio</strong>,</text>
+        }
+        habiendo sido administrado el sacramento por <strong>@Model.Sacerdote</strong>
+        en <strong>@(Model.Lugar ?? "—")</strong>.
+        Actuó como padrino/madrina: <strong>@(Model.PadrinoNombre ?? "—")</strong>.
+    </div>
+
+    <table class="acta-fields">
+        <tr><td>Nombre Confirmado</td><td><strong>@(feligres?.NombreCompleto ?? "—")</strong></td></tr>
+        @if (!string.IsNullOrWhiteSpace(Model.NombreConfirmacion))
+        {
+            <tr><td>Nombre de Confirmación</td><td>@Model.NombreConfirmacion</td></tr>
+        }
+        <tr><td>Fecha de Nacimiento</td><td>@fechaNac</td></tr>
+        <tr><td>Fecha de Confirmación</td><td>@fechaConf</td></tr>
+        <tr><td>Sacerdote / Obispo</td><td>@Model.Sacerdote</td></tr>
+        <tr><td>Padrino / Madrina</td><td>@(Model.PadrinoNombre ?? "—")</td></tr>
+        <tr><td>Lugar</td><td>@(Model.Lugar ?? "—")</td></tr>
+        @if (!string.IsNullOrWhiteSpace(Model.Observaciones))
+        {
+            <tr><td>Observaciones</td><td>@Model.Observaciones</td></tr>
+        }
+    </table>
+
+    <div class="acta-signatures">
+        <div class="sign-block">
+            <div class="sign-line"></div>
+            <div class="sign-label">Sacerdote / Obispo</div>
+        </div>
+        <div class="sign-block">
+            <div class="sign-line"></div>
+            <div class="sign-label">Secretario Parroquial</div>
+        </div>
+    </div>
+
+    <div class="acta-footer">
+        Documento expedido el @DateTime.Today.ToString("dd 'de' MMMM 'de' yyyy", new System.Globalization.CultureInfo("es-MX")) &nbsp;·&nbsp;
+        Notaría Parroquial de Axtla de Terrazas
+    </div>
+</article>

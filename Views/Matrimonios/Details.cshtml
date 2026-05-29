@@ -7,7 +7,12 @@
         <h1 class="page-title">Detalle de Matrimonio</h1>
         <nav aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="/Matrimonios">Matrimonios</a></li><li class="breadcrumb-item active">@Model.NumeroActa</li></ol></nav>
     </div>
-    <a href="/Matrimonios/Edit/@Model.Id" class="btn btn-primary btn-icon"><i class="bi bi-pencil"></i> Editar</a>
+    <div class="d-flex gap-2">
+        <a href="/Matrimonios/Acta/@Model.Id" target="_blank" class="btn btn-outline-secondary btn-icon">
+            <i class="bi bi-printer-fill"></i> Imprimir Acta
+        </a>
+        <a href="/Matrimonios/Edit/@Model.Id" class="btn btn-primary btn-icon"><i class="bi bi-pencil"></i> Editar</a>
+    </div>
 </div>
 <div class="row g-4">
     <div class="col-12 col-lg-8">

@@ -1,0 +1,60 @@
+@model Matrimonio
+@{
+    Layout = "~/Views/Shared/_ActaLayout.cshtml";
+    ViewData["Title"] = $"Acta de Matrimonio — {Model.NumeroActa}";
+    var fechaMat = Model.FechaMatrimonio.ToString("dd 'de' MMMM 'de' yyyy", new System.Globalization.CultureInfo("es-MX"));
+}
+
+<article class="acta-paper">
+    <header class="acta-header">
+        <div class="acta-church-name">Notaría Parroquial</div>
+        <div class="acta-parish">Parroquia de Axtla de Terrazas, S.L.P.</div>
+        <div class="acta-cross">&#10013;</div>
+        <div class="acta-title">Acta de Matrimonio</div>
+        <span class="acta-folio">@Model.NumeroActa</span>
+    </header>
+
+    <div class="acta-body">
+        El suscrito Párroco certifica que en los registros de esta Parroquia consta que el día
+        <strong>@fechaMat</strong>, contrajeron Matrimonio Sacramento en <strong>@(Model.Lugar ?? "—")</strong>:
+        <br><br>
+        <strong>@Model.Contrayente1Nombre</strong> y <strong>@Model.Contrayente2Nombre</strong>,
+        habiendo sido celebrado el sacramento por el <strong>@Model.Sacerdote</strong>.
+        Actuaron como testigos: <strong>@(Model.Testigo1 ?? "—")</strong>
+        y <strong>@(Model.Testigo2 ?? "—")</strong>.
+    </div>
+
+    <table class="acta-fields">
+        <tr><td>Contrayente 1</td><td><strong>@Model.Contrayente1Nombre</strong></td></tr>
+        <tr><td>Contrayente 2</td><td><strong>@Model.Contrayente2Nombre</strong></td></tr>
+        <tr><td>Fecha del Matrimonio</td><td>@fechaMat</td></tr>
+        <tr><td>Sacerdote Celebrante</td><td>@Model.Sacerdote</td></tr>
+        <tr><td>Testigo 1</td><td>@(Model.Testigo1 ?? "—")</td></tr>
+        <tr><td>Testigo 2</td><td>@(Model.Testigo2 ?? "—")</td></tr>
+        <tr><td>Lugar</td><td>@(Model.Lugar ?? "—")</td></tr>
+        @if (!string.IsNullOrWhiteSpace(Model.Observaciones))
+        {
+            <tr><td>Observaciones</td><td>@Model.Observaciones</td></tr>
+        }
+    </table>
+
+    <div class="acta-signatures">
+        <div class="sign-block">
+            <div class="sign-line"></div>
+            <div class="sign-label">@Model.Contrayente1Nombre</div>
+        </div>
+        <div class="sign-block">
+            <div class="sign-line"></div>
+            <div class="sign-label">@Model.Contrayente2Nombre</div>
+        </div>
+        <div class="sign-block">
+            <div class="sign-line"></div>
+            <div class="sign-label">Párroco Celebrante</div>
+        </div>
+    </div>
+
+    <div class="acta-footer">
+        Documento expedido el @DateTime.Today.ToString("dd 'de' MMMM 'de' yyyy", new System.Globalization.CultureInfo("es-MX")) &nbsp;·&nbsp;
+        Notaría Parroquial de Axtla de Terrazas
+    </div>
+</article>

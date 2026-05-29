@@ -45,7 +45,6 @@ public class Pago
     [Display(Name = "Referencia / Folio")]
     public string? Referencia { get; set; }
 
-    [Required(ErrorMessage = "Las notas son requeridas.")]
     [StringLength(500, ErrorMessage = "Las notas no pueden exceder 500 caracteres.")]
     [Display(Name = "Notas")]
     public string? Notas { get; set; }

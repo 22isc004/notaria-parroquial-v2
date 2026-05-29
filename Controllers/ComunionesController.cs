@@ -76,6 +76,14 @@ public class ComunionesController : Controller
         return View(item);
     }
 
+    public async Task<IActionResult> Acta(int id)
+    {
+        var item = await _db.PrimerasComuniones.Include(p => p.Feligres)
+            .FirstOrDefaultAsync(p => p.Id == id);
+        if (item == null) return NotFound();
+        return View(item);
+    }
+
     [HttpPost, ValidateAntiForgeryToken, Authorize(Roles = "Administrador")]
     public async Task<IActionResult> Delete(int id)
     {

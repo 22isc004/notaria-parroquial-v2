@@ -76,6 +76,14 @@ public class ConfirmacionesController : Controller
         return View(item);
     }
 
+    public async Task<IActionResult> Acta(int id)
+    {
+        var item = await _db.Confirmaciones.Include(c => c.Feligres)
+            .FirstOrDefaultAsync(c => c.Id == id);
+        if (item == null) return NotFound();
+        return View(item);
+    }
+
     [HttpPost, ValidateAntiForgeryToken, Authorize(Roles = "Administrador")]
     public async Task<IActionResult> Delete(int id)
     {

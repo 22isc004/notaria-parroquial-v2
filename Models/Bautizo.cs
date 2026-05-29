@@ -44,7 +44,6 @@ public class Bautizo
     [Display(Name = "Estado")]
     public EstadoSolicitud Estado { get; set; } = EstadoSolicitud.Pendiente;
 
-    [Required(ErrorMessage = "Las observaciones son requeridas.")]
     [StringLength(500, ErrorMessage = "Las observaciones no pueden exceder 500 caracteres.")]
     [Display(Name = "Observaciones")]
     public string? Observaciones { get; set; }
