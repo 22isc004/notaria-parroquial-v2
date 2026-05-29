@@ -16,6 +16,7 @@ public class Pago
     [Display(Name = "Nombre del Solicitante")]
     public string NombreSolicitante { get; set; } = string.Empty;
 
+    [Required(ErrorMessage = "El correo para notificación es requerido.")]
     [StringLength(150, ErrorMessage = "El correo no puede exceder 150 caracteres.")]
     [EmailAddress(ErrorMessage = "El correo electrónico no es válido.")]
     [Display(Name = "Correo para Notificación")]
@@ -28,6 +29,7 @@ public class Pago
     [DataType(DataType.Currency)]
     public decimal Monto { get; set; }
 
+    [Required(ErrorMessage = "La fecha de pago es requerida.")]
     [FechaNoAnterior]
     [Display(Name = "Fecha de Pago")]
     [DataType(DataType.Date)]
@@ -43,6 +45,7 @@ public class Pago
     [Display(Name = "Referencia / Folio")]
     public string? Referencia { get; set; }
 
+    [Required(ErrorMessage = "Las notas son requeridas.")]
     [StringLength(500, ErrorMessage = "Las notas no pueden exceder 500 caracteres.")]
     [Display(Name = "Notas")]
     public string? Notas { get; set; }

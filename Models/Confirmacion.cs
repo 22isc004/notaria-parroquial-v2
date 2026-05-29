@@ -22,14 +22,17 @@ public class Confirmacion
     [Display(Name = "Sacerdote / Obispo")]
     public string Sacerdote { get; set; } = string.Empty;
 
+    [Required(ErrorMessage = "El nombre de confirmación es requerido.")]
     [StringLength(100, ErrorMessage = "El nombre de confirmación no puede exceder 100 caracteres.")]
     [Display(Name = "Nombre de Confirmación")]
     public string? NombreConfirmacion { get; set; }
 
+    [Required(ErrorMessage = "El nombre del padrino es requerido.")]
     [StringLength(150, ErrorMessage = "El nombre del padrino no puede exceder 150 caracteres.")]
     [Display(Name = "Nombre del Padrino")]
     public string? PadrinoNombre { get; set; }
 
+    [Required(ErrorMessage = "El lugar es requerido.")]
     [StringLength(200, ErrorMessage = "El lugar no puede exceder 200 caracteres.")]
     [Display(Name = "Lugar")]
     public string? Lugar { get; set; }
@@ -41,6 +44,7 @@ public class Confirmacion
     [Display(Name = "Estado")]
     public EstadoSolicitud Estado { get; set; } = EstadoSolicitud.Pendiente;
 
+    [Required(ErrorMessage = "Las observaciones son requeridas.")]
     [StringLength(500, ErrorMessage = "Las observaciones no pueden exceder 500 caracteres.")]
     [Display(Name = "Observaciones")]
     public string? Observaciones { get; set; }

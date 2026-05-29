@@ -16,6 +16,7 @@ public class Feligres
     [Display(Name = "Apellido Paterno")]
     public string ApellidoPaterno { get; set; } = string.Empty;
 
+    [Required(ErrorMessage = "El apellido materno es requerido.")]
     [StringLength(80, ErrorMessage = "El apellido materno no puede exceder 80 caracteres.")]
     [Display(Name = "Apellido Materno")]
     public string? ApellidoMaterno { get; set; }
@@ -30,21 +31,25 @@ public class Feligres
     [Display(Name = "Género")]
     public Genero Genero { get; set; }
 
+    [Required(ErrorMessage = "El CURP es requerido.")]
     [StringLength(18, MinimumLength = 18, ErrorMessage = "El CURP debe tener exactamente 18 caracteres.")]
     [RegularExpression(@"^[A-Z]{4}\d{6}[HM][A-Z]{5}[0-9A-Z]\d$",
         ErrorMessage = "El CURP no tiene el formato correcto.")]
     [Display(Name = "CURP")]
     public string? Curp { get; set; }
 
+    [Required(ErrorMessage = "El teléfono es requerido.")]
     [RegularExpression(@"^\d{10}$", ErrorMessage = "El teléfono debe tener exactamente 10 dígitos.")]
     [Display(Name = "Teléfono")]
     public string? Telefono { get; set; }
 
+    [Required(ErrorMessage = "El correo electrónico es requerido.")]
     [StringLength(150, ErrorMessage = "El correo no puede exceder 150 caracteres.")]
     [EmailAddress(ErrorMessage = "El correo electrónico no es válido.")]
     [Display(Name = "Correo Electrónico")]
     public string? Email { get; set; }
 
+    [Required(ErrorMessage = "La dirección es requerida.")]
     [StringLength(200, ErrorMessage = "La dirección no puede exceder 200 caracteres.")]
     [Display(Name = "Dirección")]
     public string? Direccion { get; set; }

@@ -27,14 +27,17 @@ public class Matrimonio
     [Display(Name = "Sacerdote Celebrante")]
     public string Sacerdote { get; set; } = string.Empty;
 
+    [Required(ErrorMessage = "El nombre del testigo 1 es requerido.")]
     [StringLength(150, ErrorMessage = "El nombre del testigo no puede exceder 150 caracteres.")]
     [Display(Name = "Testigo 1")]
     public string? Testigo1 { get; set; }
 
+    [Required(ErrorMessage = "El nombre del testigo 2 es requerido.")]
     [StringLength(150, ErrorMessage = "El nombre del testigo no puede exceder 150 caracteres.")]
     [Display(Name = "Testigo 2")]
     public string? Testigo2 { get; set; }
 
+    [Required(ErrorMessage = "El lugar es requerido.")]
     [StringLength(200, ErrorMessage = "El lugar no puede exceder 200 caracteres.")]
     [Display(Name = "Lugar")]
     public string? Lugar { get; set; }
@@ -46,6 +49,7 @@ public class Matrimonio
     [Display(Name = "Estado")]
     public EstadoSolicitud Estado { get; set; } = EstadoSolicitud.Pendiente;
 
+    [Required(ErrorMessage = "Las observaciones son requeridas.")]
     [StringLength(500, ErrorMessage = "Las observaciones no pueden exceder 500 caracteres.")]
     [Display(Name = "Observaciones")]
     public string? Observaciones { get; set; }
