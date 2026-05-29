@@ -61,8 +61,19 @@ public class FeligresesController : Controller
     {
         if (id != model.Id) return BadRequest();
         if (!ModelState.IsValid) return View(model);
-
-        _db.Update(model);
+        var item = await _db.Feligreses.FindAsync(id);
+        if (item == null) return NotFound();
+        item.Nombre          = model.Nombre;
+        item.ApellidoPaterno = model.ApellidoPaterno;
+        item.ApellidoMaterno = model.ApellidoMaterno;
+        item.FechaNacimiento = model.FechaNacimiento;
+        item.Genero          = model.Genero;
+        item.Curp            = model.Curp;
+        item.Telefono        = model.Telefono;
+        item.Email           = model.Email;
+        item.Direccion       = model.Direccion;
+        item.Comunidad       = model.Comunidad;
+        item.Municipio       = model.Municipio;
         await _db.SaveChangesAsync();
         TempData["Toast"] = "success|Feligrés actualizado correctamente.";
         return RedirectToAction(nameof(Index));
