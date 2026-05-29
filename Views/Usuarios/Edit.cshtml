@@ -1,0 +1,71 @@
+@model EditarUsuarioViewModel
+@{
+    ViewData["Title"] = "Editar Usuario";
+    string[] roles = ["Administrador", "Operador", "Consulta"];
+}
+
+<div class="page-header">
+    <div>
+        <h1 class="page-title">Editar Usuario</h1>
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="/Usuarios">Usuarios</a></li>
+                <li class="breadcrumb-item active">Editar</li>
+            </ol>
+        </nav>
+    </div>
+</div>
+
+<div class="row justify-content-center">
+    <div class="col-12 col-lg-6">
+        <div class="card-panel">
+            <form asp-action="Edit" method="post">
+                @Html.AntiForgeryToken()
+                <input asp-for="Id" type="hidden" />
+                <input asp-for="Email" type="hidden" />
+                <div class="form-section-title"><i class="bi bi-person-fill me-2"></i>Datos del Usuario</div>
+                <div class="row g-3">
+                    <div class="col-12">
+                        <label class="form-label">Correo Electrónico</label>
+                        <input value="@Model.Email" class="form-control" type="email" disabled />
+                        <div class="form-text">El correo no se puede cambiar.</div>
+                    </div>
+                    <div class="col-12">
+                        <label asp-for="NombreCompleto" class="form-label"></label>
+                        <input asp-for="NombreCompleto" class="form-control" />
+                        <span asp-validation-for="NombreCompleto" class="text-danger small"></span>
+                    </div>
+                    <div class="col-12 col-md-6">
+                        <label asp-for="Rol" class="form-label"></label>
+                        <select asp-for="Rol" class="form-select">
+                            @foreach (var r in roles)
+                            {
+                                <option value="@r" selected="@(Model.Rol == r ? "selected" : null)">@r</option>
+                            }
+                        </select>
+                        <span asp-validation-for="Rol" class="text-danger small"></span>
+                    </div>
+                    <div class="col-12 col-md-6">
+                        <label asp-for="Activo" class="form-label">Estado</label>
+                        <select asp-for="Activo" class="form-select">
+                            <option value="true">Activo</option>
+                            <option value="false">Inactivo</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-actions mt-4">
+                    <a href="/Usuarios" class="btn btn-outline-secondary">Cancelar</a>
+                    <button type="submit" class="btn btn-primary btn-icon">
+                        <i class="bi bi-check-lg"></i> Guardar Cambios
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jquery-validation@1.19.5/dist/jquery.validate.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jquery-validation-unobtrusive@4.0.0/dist/jquery.validate.unobtrusive.min.js"></script>
+}

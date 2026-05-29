@@ -1,0 +1,105 @@
+@model IList<AppUser>
+@{
+    ViewData["Title"] = "Usuarios";
+    var currentUserId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+}
+
+<div class="page-header">
+    <div>
+        <h1 class="page-title">Usuarios</h1>
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item active">Usuarios del sistema</li>
+            </ol>
+        </nav>
+    </div>
+    <a href="/Usuarios/Create" class="btn btn-primary btn-icon">
+        <i class="bi bi-person-plus-fill"></i> Nuevo Usuario
+    </a>
+</div>
+
+<div class="card-panel">
+    <div class="table-responsive">
+        <table class="table data-table mb-0">
+            <thead>
+                <tr>
+                    <th>Nombre</th>
+                    <th>Correo</th>
+                    <th>Rol</th>
+                    <th>Estado</th>
+                    <th>Registrado</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var u in Model)
+                {
+                    <tr>
+                        <td>
+                            <div class="d-flex align-items-center gap-2">
+                                <div class="user-avatar-sm">
+                                    <i class="bi bi-person-fill"></i>
+                                </div>
+                                <span class="fw-500">@u.NombreCompleto</span>
+                                @if (u.Id == currentUserId)
+                                {
+                                    <span class="badge bg-primary-subtle text-primary" style="font-size:.7rem">Tú</span>
+                                }
+                            </div>
+                        </td>
+                        <td class="text-muted small">@u.Email</td>
+                        <td>
+                            @{
+                                var rolClass = u.Rol switch {
+                                    "Administrador" => "badge-danger",
+                                    "Operador"      => "badge-info",
+                                    _               => "badge-secondary"
+                                };
+                            }
+                            <span class="badge @rolClass">@u.Rol</span>
+                        </td>
+                        <td>
+                            @if (u.Activo)
+                            {
+                                <span class="badge badge-success">Activo</span>
+                            }
+                            else
+                            {
+                                <span class="badge badge-warning">Inactivo</span>
+                            }
+                        </td>
+                        <td class="text-muted small">@u.FechaCreacion.ToLocalTime().ToString("dd/MM/yyyy")</td>
+                        <td>
+                            <div class="d-flex gap-2 justify-content-end">
+                                <a href="/Usuarios/Edit/@u.Id" class="btn btn-sm btn-outline-primary" title="Editar">
+                                    <i class="bi bi-pencil-fill"></i>
+                                </a>
+                                <a href="/Usuarios/CambiarPassword/@u.Id" class="btn btn-sm btn-outline-secondary" title="Cambiar contraseña">
+                                    <i class="bi bi-key-fill"></i>
+                                </a>
+                                @if (u.Id != currentUserId)
+                                {
+                                    <form asp-action="Desactivar" asp-route-id="@u.Id" method="post"
+                                          onsubmit="return confirm('@(u.Activo ? "¿Desactivar" : "¿Activar") este usuario?')">
+                                        @Html.AntiForgeryToken()
+                                        <button type="submit" class="btn btn-sm @(u.Activo ? "btn-outline-warning" : "btn-outline-success")"
+                                                title="@(u.Activo ? "Desactivar" : "Activar")">
+                                            <i class="bi @(u.Activo ? "bi-person-slash" : "bi-person-check-fill")"></i>
+                                        </button>
+                                    </form>
+                                }
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+    @if (!Model.Any())
+    {
+        <div class="empty-state-sm mt-3">
+            <i class="bi bi-people"></i>
+            <p>No hay usuarios registrados</p>
+        </div>
+    }
+</div>

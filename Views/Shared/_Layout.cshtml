@@ -58,6 +58,12 @@
             <a href="/Pagos" class="nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Pagos" ? "active" : "")">
                 <i class="bi bi-cash-coin"></i><span>Pagos</span>
             </a>
+            @if (User.IsInRole("Administrador"))
+            {
+                <a href="/Usuarios" class="nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Usuarios" ? "active" : "")">
+                    <i class="bi bi-people-fill"></i><span>Usuarios</span>
+                </a>
+            }
         </nav>
 
         <div class="sidebar-footer">
