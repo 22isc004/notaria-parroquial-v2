@@ -160,70 +160,89 @@
 
 @section Scripts {
 <script>
-const meses = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.MesesLabels));
-const datos = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.ServiciosPorMes));
-const bautizos = @Model.TotalBautizos;
-const comuniones = @Model.TotalComuniones;
-const confirmaciones = @Model.TotalConfirmaciones;
-const matrimonios = @Model.TotalMatrimonios;
-
-// Line chart
-const ctxLine = document.getElementById('chartServicios').getContext('2d');
-const gradLine = ctxLine.createLinearGradient(0, 0, 0, 260);
-gradLine.addColorStop(0, 'rgba(99,102,241,0.3)');
-gradLine.addColorStop(1, 'rgba(99,102,241,0)');
-new Chart(ctxLine, {
-    type: 'line',
-    data: {
-        labels: meses,
-        datasets: [{
-            label: 'Servicios',
-            data: datos,
-            borderColor: '#6366f1',
-            backgroundColor: gradLine,
-            borderWidth: 2.5,
-            pointBackgroundColor: '#6366f1',
-            pointRadius: 4,
-            pointHoverRadius: 6,
-            fill: true,
-            tension: 0.4
-        }]
-    },
-    options: {
-        responsive: true, maintainAspectRatio: false,
-        plugins: { legend: { display: false }, tooltip: { mode: 'index', intersect: false,
-            backgroundColor: 'rgba(15,23,42,0.9)', titleColor: '#e2e8f0', bodyColor: '#94a3b8',
-            padding: 12, cornerRadius: 8 }},
-        scales: {
-            x: { grid: { display: false }, ticks: { color: '#94a3b8', font: { size: 12 }}},
-            y: { grid: { color: 'rgba(148,163,184,0.1)' }, ticks: { color: '#94a3b8', stepSize: 1, font: { size: 12 }}}
-        }
+document.addEventListener('DOMContentLoaded', function () {
+    if (typeof Chart === 'undefined') {
+        document.querySelectorAll('.chart-container').forEach(function (c) {
+            c.innerHTML = '<p class="text-center text-muted small pt-4">Gráfica no disponible</p>';
+        });
+        return;
     }
-});
 
-// Donut chart
-const ctxDnt = document.getElementById('chartDistribucion').getContext('2d');
-new Chart(ctxDnt, {
-    type: 'doughnut',
-    data: {
-        labels: ['Bautizos','Primera Comunión','Confirmaciones','Matrimonios'],
-        datasets: [{
-            data: [bautizos, comuniones, confirmaciones, matrimonios],
-            backgroundColor: ['#6366f1','#22c55e','#f59e0b','#ec4899'],
-            borderWidth: 0,
-            hoverOffset: 6
-        }]
-    },
-    options: {
-        responsive: true, maintainAspectRatio: false, cutout: '72%',
-        plugins: {
-            legend: { display: false },
-            tooltip: {
-                backgroundColor: 'rgba(15,23,42,0.9)', titleColor: '#e2e8f0', bodyColor: '#94a3b8',
-                padding: 12, cornerRadius: 8
-            }
+    const meses = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.MesesLabels));
+    const datos = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.ServiciosPorMes));
+    const bautizos = @Model.TotalBautizos;
+    const comuniones = @Model.TotalComuniones;
+    const confirmaciones = @Model.TotalConfirmaciones;
+    const matrimonios = @Model.TotalMatrimonios;
+
+    // Line chart
+    try {
+        const canvasLine = document.getElementById('chartServicios');
+        if (canvasLine) {
+            const ctxLine = canvasLine.getContext('2d');
+            const gradLine = ctxLine.createLinearGradient(0, 0, 0, canvasLine.parentElement.clientHeight || 260);
+            gradLine.addColorStop(0, 'rgba(99,102,241,0.3)');
+            gradLine.addColorStop(1, 'rgba(99,102,241,0)');
+            new Chart(ctxLine, {
+                type: 'line',
+                data: {
+                    labels: meses,
+                    datasets: [{
+                        label: 'Servicios',
+                        data: datos,
+                        borderColor: '#6366f1',
+                        backgroundColor: gradLine,
+                        borderWidth: 2.5,
+                        pointBackgroundColor: '#6366f1',
+                        pointRadius: 4,
+                        pointHoverRadius: 6,
+                        fill: true,
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true, maintainAspectRatio: false,
+                    plugins: { legend: { display: false }, tooltip: { mode: 'index', intersect: false,
+                        backgroundColor: 'rgba(15,23,42,0.9)', titleColor: '#e2e8f0', bodyColor: '#94a3b8',
+                        padding: 12, cornerRadius: 8 }},
+                    scales: {
+                        x: { grid: { display: false }, ticks: { color: '#94a3b8', font: { size: 12 }}},
+                        y: { suggestedMin: 0, suggestedMax: 5, grid: { color: 'rgba(148,163,184,0.1)' }, ticks: { color: '#94a3b8', stepSize: 1, font: { size: 12 }}}
+                    }
+                }
+            });
         }
-    }
+    } catch (e) { console.error('Line chart error:', e); }
+
+    // Donut chart
+    try {
+        const canvasDnt = document.getElementById('chartDistribucion');
+        if (canvasDnt) {
+            const ctxDnt = canvasDnt.getContext('2d');
+            new Chart(ctxDnt, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Bautizos','Primera Comunión','Confirmaciones','Matrimonios'],
+                    datasets: [{
+                        data: [bautizos, comuniones, confirmaciones, matrimonios],
+                        backgroundColor: ['#6366f1','#22c55e','#f59e0b','#ec4899'],
+                        borderWidth: 0,
+                        hoverOffset: 6
+                    }]
+                },
+                options: {
+                    responsive: true, maintainAspectRatio: false, cutout: '72%',
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            backgroundColor: 'rgba(15,23,42,0.9)', titleColor: '#e2e8f0', bodyColor: '#94a3b8',
+                            padding: 12, cornerRadius: 8
+                        }
+                    }
+                }
+            });
+        }
+    } catch (e) { console.error('Donut chart error:', e); }
 });
 </script>
 }
