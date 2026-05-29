@@ -62,7 +62,16 @@ public class ComunionesController : Controller
     {
         if (id != model.Id) return BadRequest();
         if (!ModelState.IsValid) { await LoadSelectAsync(); return View(model); }
-        _db.Update(model);
+        var item = await _db.PrimerasComuniones.FindAsync(id);
+        if (item == null) return NotFound();
+        item.FeligresId    = model.FeligresId;
+        item.FechaComunion = model.FechaComunion;
+        item.Sacerdote     = model.Sacerdote;
+        item.PadrinoNombre = model.PadrinoNombre;
+        item.MadrinaNombre = model.MadrinaNombre;
+        item.Lugar         = model.Lugar;
+        item.Estado        = model.Estado;
+        item.Observaciones = model.Observaciones;
         await _db.SaveChangesAsync();
         TempData["Toast"] = "success|Primera Comunión actualizada.";
         return RedirectToAction(nameof(Index));

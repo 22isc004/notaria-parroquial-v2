@@ -69,7 +69,16 @@ public class BautizosController : Controller
     {
         if (id != model.Id) return BadRequest();
         if (!ModelState.IsValid) { await LoadFeligresSelectAsync(); return View(model); }
-        _db.Update(model);
+        var item = await _db.Bautizos.FindAsync(id);
+        if (item == null) return NotFound();
+        item.FeligresId    = model.FeligresId;
+        item.FechaBautizo  = model.FechaBautizo;
+        item.Sacerdote     = model.Sacerdote;
+        item.PadrinoNombre = model.PadrinoNombre;
+        item.MadrinaNombre = model.MadrinaNombre;
+        item.LugarBautizo  = model.LugarBautizo;
+        item.Estado        = model.Estado;
+        item.Observaciones = model.Observaciones;
         await _db.SaveChangesAsync();
         TempData["Toast"] = "success|Bautizo actualizado.";
         return RedirectToAction(nameof(Index));

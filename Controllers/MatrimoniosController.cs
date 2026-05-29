@@ -56,7 +56,17 @@ public class MatrimoniosController : Controller
     {
         if (id != model.Id) return BadRequest();
         if (!ModelState.IsValid) return View(model);
-        _db.Update(model);
+        var item = await _db.Matrimonios.FindAsync(id);
+        if (item == null) return NotFound();
+        item.Contrayente1Nombre = model.Contrayente1Nombre;
+        item.Contrayente2Nombre = model.Contrayente2Nombre;
+        item.FechaMatrimonio    = model.FechaMatrimonio;
+        item.Sacerdote          = model.Sacerdote;
+        item.Testigo1           = model.Testigo1;
+        item.Testigo2           = model.Testigo2;
+        item.Lugar              = model.Lugar;
+        item.Estado             = model.Estado;
+        item.Observaciones      = model.Observaciones;
         await _db.SaveChangesAsync();
         TempData["Toast"] = "success|Matrimonio actualizado.";
         return RedirectToAction(nameof(Index));

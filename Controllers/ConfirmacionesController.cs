@@ -62,7 +62,16 @@ public class ConfirmacionesController : Controller
     {
         if (id != model.Id) return BadRequest();
         if (!ModelState.IsValid) { await LoadSelectAsync(); return View(model); }
-        _db.Update(model);
+        var item = await _db.Confirmaciones.FindAsync(id);
+        if (item == null) return NotFound();
+        item.FeligresId         = model.FeligresId;
+        item.FechaConfirmacion  = model.FechaConfirmacion;
+        item.Sacerdote          = model.Sacerdote;
+        item.NombreConfirmacion = model.NombreConfirmacion;
+        item.PadrinoNombre      = model.PadrinoNombre;
+        item.Lugar              = model.Lugar;
+        item.Estado             = model.Estado;
+        item.Observaciones      = model.Observaciones;
         await _db.SaveChangesAsync();
         TempData["Toast"] = "success|Confirmación actualizada.";
         return RedirectToAction(nameof(Index));
