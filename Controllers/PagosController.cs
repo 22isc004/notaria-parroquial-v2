@@ -58,6 +58,13 @@ public class PagosController : Controller
         return View(item);
     }
 
+    public async Task<IActionResult> Ticket(int id)
+    {
+        var item = await _db.Pagos.FindAsync(id);
+        if (item == null) return NotFound();
+        return View(item);
+    }
+
     [HttpPost, ValidateAntiForgeryToken]
     public async Task<IActionResult> Confirmar(int id)
     {

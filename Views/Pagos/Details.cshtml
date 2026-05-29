@@ -12,6 +12,9 @@
         </ol></nav>
     </div>
     <div class="d-flex gap-2">
+        <a href="/Pagos/Ticket/@Model.Id" target="_blank" class="btn btn-outline-secondary btn-icon">
+            <i class="bi bi-receipt-cutoff"></i> Imprimir Ticket
+        </a>
         @if (esPendiente)
         {
             @Html.AntiForgeryToken()

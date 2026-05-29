@@ -2,62 +2,96 @@
 @{
     Layout = "~/Views/Shared/_ActaLayout.cshtml";
     ViewData["Title"] = $"Acta de Primera Comunión — {Model.NumeroBoleta}";
-    var feligres = Model.Feligres;
-    var fechaComunion = Model.FechaComunion.ToString("dd 'de' MMMM 'de' yyyy", new System.Globalization.CultureInfo("es-MX"));
-    var fechaNac = feligres?.FechaNacimiento.ToString("dd 'de' MMMM 'de' yyyy", new System.Globalization.CultureInfo("es-MX")) ?? "—";
+    var cx   = System.Globalization.CultureInfo.GetCultureInfo("es-MX");
+    var f    = Model.Feligres;
+    var fCom = Model.FechaComunion.ToString("dd 'de' MMMM 'de' yyyy", cx);
+    var fNac = f?.FechaNacimiento.ToString("dd 'de' MMMM 'de' yyyy", cx) ?? "—";
+    var fExp = DateOnly.FromDateTime(DateTime.Today).ToString("dd 'de' MMMM 'de' yyyy", cx);
 }
 
-<article class="acta-paper">
-    <header class="acta-header">
-        <div class="acta-church-name">Notaría Parroquial</div>
-        <div class="acta-parish">Parroquia de Axtla de Terrazas, S.L.P.</div>
-        <div class="acta-cross">&#10013;</div>
-        <div class="acta-title">Acta de Primera Comunión</div>
-        <span class="acta-folio">@Model.NumeroBoleta</span>
-    </header>
-
-    <div class="acta-body">
-        El suscrito Párroco certifica que en los registros de esta Parroquia consta que el día
-        <strong>@fechaComunion</strong>, recibió por primera vez el Sacramento de la Eucaristía:
-        <br><br>
-        <strong>@(feligres?.NombreCompleto ?? "—")</strong>,
-        @if (feligres != null)
-        {
-            <text>nacido/a el <strong>@fechaNac</strong>, originario/a de <strong>@feligres.Comunidad, @feligres.Municipio</strong>,</text>
-        }
-        habiendo sido celebrado dicho sacramento por el <strong>@Model.Sacerdote</strong>
-        en <strong>@(Model.Lugar ?? "—")</strong>.
-        Actuaron como padrinos: <strong>@(Model.PadrinoNombre ?? "—")</strong> (padrino)
-        y <strong>@(Model.MadrinaNombre ?? "—")</strong> (madrina).
+<div class="acta-id-strip">
+    <div class="diocese-block">
+        <strong>Diócesis de Ciudad Valles</strong>
+        Provincia Eclesiástica de San Luis Potosí<br>
+        República Mexicana
     </div>
+    <div class="folio-block">
+        Folio de registro<br>
+        <span class="folio-num">@Model.NumeroBoleta</span>
+    </div>
+</div>
 
-    <table class="acta-fields">
-        <tr><td>Nombre</td><td><strong>@(feligres?.NombreCompleto ?? "—")</strong></td></tr>
-        <tr><td>Fecha de Nacimiento</td><td>@fechaNac</td></tr>
-        <tr><td>Fecha de Comunión</td><td>@fechaComunion</td></tr>
-        <tr><td>Sacerdote Celebrante</td><td>@Model.Sacerdote</td></tr>
-        <tr><td>Padrino</td><td>@(Model.PadrinoNombre ?? "—")</td></tr>
-        <tr><td>Madrina</td><td>@(Model.MadrinaNombre ?? "—")</td></tr>
-        <tr><td>Lugar</td><td>@(Model.Lugar ?? "—")</td></tr>
-        @if (!string.IsNullOrWhiteSpace(Model.Observaciones))
-        {
-            <tr><td>Observaciones</td><td>@Model.Observaciones</td></tr>
-        }
-    </table>
+<div class="ornament">✦ &nbsp; ✦ &nbsp; ✦</div>
 
-    <div class="acta-signatures">
-        <div class="sign-block">
-            <div class="sign-line"></div>
-            <div class="sign-label">Párroco Celebrante</div>
+<header class="acta-header">
+    <div class="acta-church">Parroquia de Axtla de Terrazas</div>
+    <div class="acta-parish-sub">Axtla de Terrazas, San Luis Potosí, México</div>
+    <span class="acta-cross-big">✝</span>
+    <div class="acta-titulo">Acta de Primera Comunión</div>
+</header>
+
+<div class="header-rule"></div>
+
+<span class="cert-label">Certificación</span>
+
+<p class="acta-texto">
+    Yo, el Infrascrito Párroco de la Parroquia de <strong>Axtla de Terrazas</strong>, perteneciente
+    a la Diócesis de Ciudad Valles, S.L.P., México, <strong>CERTIFICO</strong>: que en el Libro de
+    Primeras Comuniones de esta Parroquia consta la siguiente acta:
+</p>
+
+<p class="acta-texto">
+    En <strong>@(Model.Lugar ?? "—")</strong>, siendo el día
+    <strong>@fCom</strong>, el Presbítero <strong>@Model.Sacerdote</strong>
+    administró por primera vez el Sacramento de la <strong>Santísima Eucaristía</strong> a:
+    <strong>@(f?.NombreCompleto ?? "—")</strong>,
+    quien nació el <strong>@fNac</strong>@(f != null ? $", originario/a de {f.Comunidad}, {f.Municipio}, San Luis Potosí" : "").
+    Acompañaron como Padrinos de Primera Comunión:
+    <strong>@(Model.PadrinoNombre ?? "—")</strong> (Padrino) y
+    <strong>@(Model.MadrinaNombre ?? "—")</strong> (Madrina).
+</p>
+
+@if (!string.IsNullOrWhiteSpace(Model.Observaciones))
+{
+    <p class="acta-texto"><em>Observaciones: @Model.Observaciones</em></p>
+}
+
+<p class="datos-titulo">Extracto de datos</p>
+<table class="datos-tabla">
+    <tr><td class="lbl">Nombre</td><td><strong>@(f?.NombreCompleto ?? "—")</strong></td></tr>
+    <tr><td class="lbl">Fecha de Nacimiento</td><td>@fNac</td></tr>
+    <tr><td class="lbl">Comunidad de Origen</td><td>@(f != null ? $"{f.Comunidad}, {f.Municipio}" : "—")</td></tr>
+    <tr><td class="lbl">Fecha de la Comunión</td><td>@fCom</td></tr>
+    <tr><td class="lbl">Lugar</td><td>@(Model.Lugar ?? "—")</td></tr>
+    <tr><td class="lbl">Ministro Celebrante</td><td>@Model.Sacerdote</td></tr>
+    <tr><td class="lbl">Padrino</td><td>@(Model.PadrinoNombre ?? "—")</td></tr>
+    <tr><td class="lbl">Madrina</td><td>@(Model.MadrinaNombre ?? "—")</td></tr>
+</table>
+
+<p class="cierre">
+    Y para los efectos legales y espirituales que convengan, a petición del interesado, firmo y
+    sello la presente Acta de Primera Comunión en Axtla de Terrazas, S.L.P., a <strong>@fExp</strong>.
+</p>
+
+<div class="firmas-wrap">
+    <div class="sello-circulo">
+        <div class="sello-cruz">✝</div>
+        SELLO<br>PARROQUIAL
+    </div>
+    <div class="firmas-derecha">
+        <div class="firma-bloque">
+            <div class="firma-linea"></div>
+            <div class="firma-nombre">@Model.Sacerdote</div>
+            <div class="firma-cargo">Párroco Celebrante</div>
         </div>
-        <div class="sign-block">
-            <div class="sign-line"></div>
-            <div class="sign-label">Secretario Parroquial</div>
+        <div class="firma-bloque">
+            <div class="firma-linea"></div>
+            <div class="firma-nombre">&nbsp;</div>
+            <div class="firma-cargo">Secretario Parroquial</div>
         </div>
     </div>
+</div>
 
-    <div class="acta-footer">
-        Documento expedido el @DateTime.Today.ToString("dd 'de' MMMM 'de' yyyy", new System.Globalization.CultureInfo("es-MX")) &nbsp;·&nbsp;
-        Notaría Parroquial de Axtla de Terrazas
-    </div>
-</article>
+<div class="acta-pie">
+    Documento expedido el @fExp &nbsp;·&nbsp; Parroquia de Axtla de Terrazas, Diócesis de Ciudad Valles &nbsp;·&nbsp; Folio @Model.NumeroBoleta
+</div>

@@ -4,218 +4,215 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"]</title>
-    <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
     <style>
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
         body {
             font-family: 'EB Garamond', Georgia, serif;
-            background: #f0ece4;
-            color: #1a1a1a;
+            background: #e8e0d4;
+            color: #1a1203;
             min-height: 100vh;
             display: flex;
             flex-direction: column;
             align-items: center;
-            padding: 32px 16px 64px;
+            padding: 28px 16px 72px;
         }
 
-        /* ── Toolbar (only on screen) ── */
-        .acta-toolbar {
-            width: 100%;
-            max-width: 780px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
+        /* ── Toolbar ── */
+        .toolbar {
+            width: 100%; max-width: 800px;
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 18px;
         }
         .btn-back {
-            font-family: 'Inter', sans-serif;
-            font-size: .85rem;
-            color: #555;
-            text-decoration: none;
-            display: flex;
-            align-items: center;
-            gap: 6px;
+            font-family: 'Inter', sans-serif; font-size: .82rem; color: #6b5e47;
+            text-decoration: none; display: flex; align-items: center; gap: 5px;
         }
-        .btn-back:hover { color: #111; }
+        .btn-back:hover { color: #1a1203; }
         .btn-print {
-            font-family: 'Inter', sans-serif;
-            font-size: .875rem;
-            font-weight: 500;
-            background: #2d5016;
-            color: #fff;
-            border: none;
-            border-radius: 6px;
-            padding: 9px 20px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 8px;
+            font-family: 'Inter', sans-serif; font-size: .85rem; font-weight: 600;
+            background: #1e3d0e; color: #fff; border: none; border-radius: 6px;
+            padding: 10px 22px; cursor: pointer; letter-spacing: .02em;
             transition: background .15s;
         }
-        .btn-print:hover { background: #1e3a0f; }
+        .btn-print:hover { background: #142b09; }
 
-        /* ── Acta paper ── */
-        .acta-paper {
-            width: 100%;
-            max-width: 780px;
-            background: #fff;
-            border: 1px solid #d6cfc3;
-            box-shadow: 0 4px 24px rgba(0,0,0,.12);
-            padding: 56px 64px 64px;
+        /* ── Paper ── */
+        .papel {
+            width: 100%; max-width: 800px;
+            background: #fdfaf4;
+            box-shadow: 0 6px 32px rgba(0,0,0,.18);
+            padding: 0;
             position: relative;
         }
 
-        /* Decorative border */
-        .acta-paper::before {
+        /* Outer gold border */
+        .papel::before {
             content: '';
-            position: absolute;
-            inset: 12px;
-            border: 1.5px solid #b8a97a;
-            pointer-events: none;
+            position: absolute; inset: 10px;
+            border: 2px solid #c8a84b;
+            pointer-events: none; z-index: 1;
+        }
+        /* Inner thin border */
+        .papel::after {
+            content: '';
+            position: absolute; inset: 15px;
+            border: .5px solid #c8a84b;
+            pointer-events: none; z-index: 1;
+        }
+
+        /* ── Inner content wrapper ── */
+        .papel-inner { padding: 52px 60px 60px; }
+
+        /* ── Top identifier strip ── */
+        .acta-id-strip {
+            display: flex; justify-content: space-between; align-items: flex-start;
+            margin-bottom: 28px;
+        }
+        .diocese-block { font-size: .78rem; color: #7a6a4f; line-height: 1.5; }
+        .diocese-block strong { font-family: 'Cinzel', serif; font-size: .8rem; color: #1e3d0e; display: block; }
+        .folio-block {
+            text-align: right; font-family: 'Inter', sans-serif; font-size: .73rem;
+            color: #7a6a4f; line-height: 1.6;
+        }
+        .folio-num {
+            display: inline-block; margin-top: 2px;
+            background: #1e3d0e; color: #fff; font-weight: 700;
+            font-size: .75rem; letter-spacing: .08em;
+            padding: 4px 12px; border-radius: 3px;
+        }
+
+        /* ── Divider ornamental ── */
+        .ornament {
+            text-align: center; margin: 0 0 22px;
+            font-size: .9rem; color: #c8a84b; letter-spacing: .4em;
         }
 
         /* ── Header ── */
-        .acta-header {
-            text-align: center;
-            margin-bottom: 36px;
-            padding-bottom: 24px;
-            border-bottom: 2px solid #b8a97a;
-        }
-        .acta-church-name {
-            font-size: 1.05rem;
-            font-weight: 600;
-            letter-spacing: .12em;
+        .acta-header { text-align: center; margin-bottom: 32px; }
+        .acta-church {
+            font-family: 'Cinzel', serif;
+            font-size: 1.18rem; font-weight: 700;
+            letter-spacing: .1em; color: #1e3d0e;
             text-transform: uppercase;
-            color: #2d5016;
         }
-        .acta-parish {
-            font-size: .9rem;
-            color: #666;
-            margin-top: 2px;
-            font-style: italic;
+        .acta-parish-sub {
+            font-size: .88rem; font-style: italic; color: #6b5a3a; margin-top: 3px;
         }
-        .acta-cross {
-            font-size: 2rem;
-            color: #b8a97a;
-            margin: 14px 0 10px;
-            line-height: 1;
+        .acta-cross-big {
+            font-size: 2.4rem; color: #c8a84b; display: block;
+            margin: 16px 0 12px; line-height: 1;
         }
-        .acta-title {
-            font-size: 1.6rem;
-            font-weight: 700;
-            letter-spacing: .08em;
+        .acta-titulo {
+            font-family: 'Cinzel', serif;
+            font-size: 1.55rem; font-weight: 700;
+            letter-spacing: .12em; color: #1a1203;
             text-transform: uppercase;
-            color: #1a1a1a;
-            margin-top: 6px;
-        }
-        .acta-folio {
-            display: inline-block;
-            margin-top: 10px;
-            font-family: 'Inter', sans-serif;
-            font-size: .78rem;
-            font-weight: 600;
-            letter-spacing: .1em;
-            background: #2d5016;
-            color: #fff;
-            padding: 3px 12px;
-            border-radius: 4px;
         }
 
-        /* ── Body text ── */
-        .acta-body {
-            font-size: 1.05rem;
-            line-height: 1.85;
-            color: #222;
-            margin-bottom: 32px;
-            text-align: justify;
-        }
-        .acta-body strong { font-weight: 600; }
-
-        /* ── Data table ── */
-        .acta-fields {
-            width: 100%;
-            border-collapse: collapse;
-            margin: 28px 0;
-            font-size: .97rem;
-        }
-        .acta-fields tr { border-bottom: 1px dotted #ccc; }
-        .acta-fields td {
-            padding: 8px 4px;
-            vertical-align: top;
-        }
-        .acta-fields td:first-child {
-            width: 38%;
-            font-weight: 600;
-            color: #555;
-            font-size: .88rem;
-            letter-spacing: .04em;
-            text-transform: uppercase;
-            font-family: 'Inter', sans-serif;
-            padding-right: 16px;
+        /* ── Header separator ── */
+        .header-rule {
+            width: 100%; height: 2px;
+            background: linear-gradient(to right, transparent, #c8a84b 20%, #c8a84b 80%, transparent);
+            margin: 24px 0 28px;
         }
 
-        /* ── Signatures ── */
-        .acta-signatures {
-            display: flex;
-            justify-content: space-around;
-            gap: 32px;
-            margin-top: 56px;
+        /* ── Certification text ── */
+        .cert-label {
+            font-family: 'Cinzel', serif; font-size: .78rem; font-weight: 600;
+            letter-spacing: .18em; color: #1e3d0e; text-transform: uppercase;
+            display: block; margin-bottom: 14px;
         }
-        .sign-block {
-            flex: 1;
-            text-align: center;
+        .acta-texto {
+            font-size: 1.07rem; line-height: 1.9; color: #1a1203;
+            text-align: justify; margin-bottom: 10px;
         }
-        .sign-line {
-            border-top: 1.5px solid #222;
-            margin-bottom: 8px;
+        .acta-texto strong { font-weight: 600; }
+
+        /* ── Datos ── */
+        .datos-titulo {
+            font-family: 'Cinzel', serif; font-size: .72rem; font-weight: 600;
+            letter-spacing: .18em; color: #7a6a4f; text-transform: uppercase;
+            margin: 28px 0 10px;
         }
-        .sign-label {
-            font-size: .82rem;
-            color: #555;
-            font-family: 'Inter', sans-serif;
-            font-weight: 500;
-            text-transform: uppercase;
-            letter-spacing: .06em;
+        .datos-tabla {
+            width: 100%; border-collapse: collapse;
+            font-size: .97rem; margin-bottom: 16px;
+        }
+        .datos-tabla tr { border-bottom: 1px solid #e2d9c8; }
+        .datos-tabla tr:last-child { border-bottom: none; }
+        .datos-tabla td { padding: 7px 6px; vertical-align: top; }
+        .datos-tabla td.lbl {
+            width: 36%; font-family: 'Inter', sans-serif; font-size: .77rem;
+            font-weight: 600; color: #8a7558; letter-spacing: .05em;
+            text-transform: uppercase; padding-right: 16px; white-space: nowrap;
+        }
+
+        /* ── Cierre ── */
+        .cierre {
+            font-size: .98rem; line-height: 1.85; color: #1a1203;
+            text-align: justify; margin-top: 24px; font-style: italic;
+        }
+
+        /* ── Firmas ── */
+        .firmas-wrap {
+            display: flex; align-items: flex-end; justify-content: space-between;
+            gap: 24px; margin-top: 56px;
+        }
+        .sello-circulo {
+            width: 110px; height: 110px; flex-shrink: 0;
+            border-radius: 50%; border: 2px dashed #c8a84b;
+            display: flex; flex-direction: column;
+            align-items: center; justify-content: center; text-align: center;
+            color: #c8a84b; font-family: 'Inter', sans-serif;
+            font-size: .6rem; font-weight: 600; letter-spacing: .1em;
+            text-transform: uppercase; line-height: 1.5;
+        }
+        .sello-cruz { font-size: 1.4rem; margin-bottom: 2px; }
+        .firmas-derecha { flex: 1; display: flex; justify-content: space-around; gap: 24px; }
+        .firma-bloque { flex: 1; text-align: center; }
+        .firma-linea { border-top: 1.5px solid #1a1203; margin-bottom: 6px; }
+        .firma-nombre { font-size: .88rem; color: #1a1203; font-weight: 500; }
+        .firma-cargo {
+            font-family: 'Inter', sans-serif; font-size: .68rem; color: #7a6a4f;
+            text-transform: uppercase; letter-spacing: .08em; margin-top: 2px;
         }
 
         /* ── Footer ── */
-        .acta-footer {
-            text-align: center;
-            margin-top: 40px;
-            padding-top: 20px;
-            border-top: 1px solid #ddd;
-            font-size: .82rem;
-            color: #999;
-            font-family: 'Inter', sans-serif;
-            font-style: italic;
+        .acta-pie {
+            margin-top: 36px; padding-top: 16px;
+            border-top: 1px solid #e2d9c8;
+            text-align: center; font-family: 'Inter', sans-serif;
+            font-size: .7rem; color: #9e8e74; letter-spacing: .03em;
         }
 
-        /* ── Print styles ── */
+        /* ── Print ── */
         @@media print {
             body { background: white; padding: 0; }
-            .acta-toolbar { display: none; }
-            .acta-paper {
-                box-shadow: none;
-                border: none;
-                max-width: 100%;
-                padding: 20mm 20mm 25mm;
+            .toolbar { display: none; }
+            .papel {
+                box-shadow: none; max-width: 100%;
             }
-            .acta-paper::before { inset: 8mm; }
-            @@page { size: A4; margin: 0; }
+            .papel-inner { padding: 18mm 22mm 22mm; }
+            .papel::before { inset: 8mm; }
+            .papel::after { inset: 12mm; }
+            @@page { size: A4 portrait; margin: 0; }
         }
     </style>
 </head>
 <body>
-    <div class="acta-toolbar">
-        <a href="javascript:history.back()" class="btn-back">
-            &#8592; Volver
-        </a>
-        <button class="btn-print" onclick="window.print()">
-            &#128438; Imprimir Acta
-        </button>
-    </div>
 
-    @RenderBody()
+<div class="toolbar">
+    <a href="javascript:history.back()" class="btn-back">&#8592; Volver</a>
+    <button class="btn-print" onclick="window.print()">&#128438;&nbsp; Imprimir</button>
+</div>
+
+<div class="papel">
+    <div class="papel-inner">
+        @RenderBody()
+    </div>
+</div>
+
 </body>
 </html>

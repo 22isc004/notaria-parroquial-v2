@@ -1,0 +1,88 @@
+@model Pago
+@{
+    Layout = "~/Views/Shared/_TicketLayout.cshtml";
+    ViewData["Title"] = $"Ticket — {Model.Referencia}";
+    var cx     = System.Globalization.CultureInfo.GetCultureInfo("es-MX");
+    var fReg   = Model.FechaRegistro.ToLocalTime().ToString("dd/MMM/yyyy HH:mm", cx).ToUpper();
+    var fPago  = Model.FechaPago.HasValue ? Model.FechaPago.Value.ToString("dd 'de' MMMM 'de' yyyy", cx) : "—";
+    var statusClass = Model.Estado switch {
+        EstadoPago.Confirmado => "status-confirmado",
+        EstadoPago.Rechazado  => "status-rechazado",
+        _                     => "status-pendiente"
+    };
+    var statusText = Model.Estado switch {
+        EstadoPago.Confirmado => "✓ PAGO CONFIRMADO",
+        EstadoPago.Rechazado  => "✗ PAGO RECHAZADO",
+        _                     => "⏳ PAGO PENDIENTE"
+    };
+    // Pseudo-random barcode widths from reference string
+    var bars = (Model.Referencia ?? "REF").PadRight(32).Take(32)
+               .Select(c => (c % 3 == 0 ? 4 : c % 3 == 1 ? 2 : 3));
+}
+
+<!-- Header -->
+<div class="ticket-header">
+    <div class="ticket-logo">Notaría Parroquial</div>
+    <div class="ticket-org">Parroquia de Axtla de Terrazas</div>
+    <div class="ticket-org-sub">Axtla de Terrazas, S.L.P., México</div>
+</div>
+
+<div class="ticket-type">Comprobante de Pago</div>
+
+<!-- Body -->
+<div class="ticket-body">
+
+    <!-- Reference -->
+    <div class="ticket-ref">
+        <div class="ref-label">No. de Referencia</div>
+        <div class="ref-num">@Model.Referencia</div>
+    </div>
+
+    <!-- Amount -->
+    <div class="ticket-amount">
+        <div class="amount-label">Total a Pagar</div>
+        <div class="amount-value">$@Model.Monto.ToString("N2")</div>
+        <div class="amount-method">@Model.MetodoPago · MXN</div>
+    </div>
+
+    <!-- Status -->
+    <div class="ticket-status">
+        <span class="status-badge @statusClass">@statusText</span>
+    </div>
+
+    <!-- Fields -->
+    <div style="margin-top:20px">
+        <div class="campo"><span class="campo-lbl">Servicio</span><span class="campo-val">@Model.TipoServicio</span></div>
+        <div class="campo"><span class="campo-lbl">Solicitante</span><span class="campo-val">@Model.NombreSolicitante</span></div>
+        @if (!string.IsNullOrEmpty(Model.EmailNotificacion))
+        {
+            <div class="campo"><span class="campo-lbl">Correo</span><span class="campo-val" style="font-size:.8rem">@Model.EmailNotificacion</span></div>
+        }
+        <div class="campo"><span class="campo-lbl">Fecha de Pago</span><span class="campo-val">@fPago</span></div>
+        <div class="campo"><span class="campo-lbl">Método</span><span class="campo-val">@Model.MetodoPago</span></div>
+        <div class="campo"><span class="campo-lbl">Registrado</span><span class="campo-val" style="font-size:.78rem">@fReg</span></div>
+        @if (!string.IsNullOrEmpty(Model.Notas))
+        {
+            <div class="campo"><span class="campo-lbl">Notas</span><span class="campo-val" style="font-size:.8rem">@Model.Notas</span></div>
+        }
+    </div>
+</div>
+
+<!-- Tear line -->
+<div class="tear"></div>
+
+<!-- Footer -->
+<div class="ticket-footer">
+    <p>
+        Conserve este comprobante como constancia de su trámite.<br>
+        <strong>Parroquia de Axtla de Terrazas</strong> &nbsp;·&nbsp; Diócesis de Ciudad Valles, S.L.P.
+    </p>
+    <!-- Barcode decoration -->
+    <div class="barcode">
+        @foreach (var w in bars)
+        {
+            <span style="width:@(w)px"></span>
+        }
+    </div>
+    <p style="margin-top:6px;font-size:.65rem">@(Model.Referencia)</p>
+</div>
