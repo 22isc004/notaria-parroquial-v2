@@ -1,36 +1,138 @@
 @model IEnumerable<Pago>
+@using NotariaParroquial.Models.ViewModels
 @{
     ViewData["Title"] = "Pagos";
     string q = ViewBag.Query ?? "";
     int page = ViewBag.Page; int totalPages = ViewBag.TotalPages;
     EstadoPago? estado = ViewBag.Estado;
+    var sinPago = (List<ServicioSinPago>)(ViewBag.SinPago ?? new List<ServicioSinPago>());
 }
+
 <div class="page-header">
     <div>
         <h1 class="page-title"><i class="bi bi-cash-coin text-success me-2"></i>Pagos</h1>
-        <p class="page-desc">@ViewBag.Total registro(s)</p>
+        <p class="page-desc">@ViewBag.Total pago(s) registrado(s)</p>
     </div>
     <a href="/Pagos/Create" class="btn btn-primary btn-icon"><i class="bi bi-plus-lg"></i> Registrar Pago</a>
 </div>
+
+@* ── Servicios pendientes de cobro ── *@
+@if (sinPago.Any())
+{
+    <div class="card-panel mb-4" style="border-left: 4px solid #f59e0b;">
+        <div class="panel-header mb-3">
+            <div>
+                <h5 class="panel-title">
+                    <i class="bi bi-exclamation-circle-fill text-warning me-2"></i>
+                    Servicios sin cobrar
+                </h5>
+                <p class="panel-subtitle">@sinPago.Count servicio(s) registrado(s) aún no tienen pago vinculado</p>
+            </div>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-hover data-table mb-0">
+                <thead>
+                    <tr>
+                        <th>Sacramento / Servicio</th>
+                        <th>Nombre</th>
+                        <th>Folio</th>
+                        <th>Fecha</th>
+                        <th>Estado</th>
+                        <th class="text-end">Acción</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var s in sinPago)
+                    {
+                        var tipoLabel = s.Tipo switch {
+                            "PrimeraComunion" => "Primera Comunión",
+                            _ => s.Tipo
+                        };
+                        var estadoClass = s.Estado switch {
+                            EstadoSolicitud.Completado => "badge-success",
+                            EstadoSolicitud.Programado => "badge-info",
+                            EstadoSolicitud.Cancelado  => "badge-danger",
+                            _                          => "badge-warning"
+                        };
+                        <tr>
+                            <td>
+                                <span class="d-flex align-items-center gap-2">
+                                    <i class="bi @s.TipoIcono @s.TipoColor"></i>
+                                    <span class="fw-500">@tipoLabel</span>
+                                </span>
+                            </td>
+                            <td>@s.Nombre</td>
+                            <td><code class="badge-code">@(s.Folio ?? "—")</code></td>
+                            <td>@s.Fecha.ToString("dd/MM/yyyy")</td>
+                            <td><span class="badge @estadoClass">@s.Estado</span></td>
+                            <td class="text-end">
+                                <a href="/Pagos/Create?tipo=@s.Tipo&sacramentoId=@s.Id"
+                                   class="btn btn-sm btn-warning btn-icon">
+                                    <i class="bi bi-cash-coin"></i> Cobrar
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+}
+
+@* ── Filtros ── *@
 <div class="card-panel mb-4">
     <form method="get" class="row g-2 align-items-end">
-        <div class="col-12 col-md-5"><div class="input-group"><span class="input-group-text"><i class="bi bi-search"></i></span><input type="text" name="q" value="@q" class="form-control" placeholder="Buscar por nombre o referencia…" /></div></div>
-        <div class="col-12 col-md-3"><select name="estado" class="form-select"><option value="">Todos los estados</option>@foreach (EstadoPago e in Enum.GetValues<EstadoPago>()) { <option value="@((int)e)" selected="@(estado == e)">@e</option> }</select></div>
-        <div class="col-auto"><button type="submit" class="btn btn-primary">Filtrar</button>@if (!string.IsNullOrEmpty(q) || estado.HasValue) { <a href="/Pagos" class="btn btn-outline-secondary ms-1">Limpiar</a> }</div>
+        <div class="col-12 col-md-5">
+            <div class="input-group">
+                <span class="input-group-text"><i class="bi bi-search"></i></span>
+                <input type="text" name="q" value="@q" class="form-control" placeholder="Buscar por nombre o referencia…" />
+            </div>
+        </div>
+        <div class="col-12 col-md-3">
+            <select name="estado" class="form-select">
+                <option value="">Todos los estados</option>
+                @foreach (EstadoPago e in Enum.GetValues<EstadoPago>())
+                {
+                    <option value="@((int)e)" selected="@(estado == e)">@e</option>
+                }
+            </select>
+        </div>
+        <div class="col-auto">
+            <button type="submit" class="btn btn-primary">Filtrar</button>
+            @if (!string.IsNullOrEmpty(q) || estado.HasValue)
+            {
+                <a href="/Pagos" class="btn btn-outline-secondary ms-1">Limpiar</a>
+            }
+        </div>
     </form>
 </div>
+
+@* ── Tabla de pagos ── *@
 @if (Model.Any())
 {
     <div class="card-panel p-0">
         <div class="table-responsive">
             <table class="table table-hover data-table mb-0">
-                <thead><tr><th>Referencia</th><th>Solicitante</th><th>Servicio</th><th>Monto</th><th>Fecha Pago</th><th>Estado</th><th class="text-end">Acciones</th></tr></thead>
+                <thead>
+                    <tr>
+                        <th>Referencia</th>
+                        <th>Solicitante</th>
+                        <th>Servicio</th>
+                        <th>Monto</th>
+                        <th>Fecha Pago</th>
+                        <th>Estado</th>
+                        <th class="text-end">Acciones</th>
+                    </tr>
+                </thead>
                 <tbody>
                     @foreach (var p in Model)
                     {
                         <tr>
                             <td><code class="badge-code">@p.Referencia</code></td>
-                            <td><div class="fw-500">@p.NombreSolicitante</div><small class="text-muted">@p.EmailNotificacion</small></td>
+                            <td>
+                                <div class="fw-500">@p.NombreSolicitante</div>
+                                <small class="text-muted">@p.EmailNotificacion</small>
+                            </td>
                             <td><span class="badge badge-light">@p.TipoServicio</span></td>
                             <td class="fw-600 text-success">$@p.Monto.ToString("N2")</td>
                             <td>@(p.FechaPago.HasValue ? p.FechaPago.Value.ToString("dd/MM/yyyy") : "—")</td>
@@ -40,7 +142,9 @@
                                 </span>
                             </td>
                             <td class="text-end">
-                                <a href="/Pagos/Details/@p.Id" class="btn btn-sm btn-outline-secondary" aria-label="Ver detalle"><i class="bi bi-eye"></i></a>
+                                <a href="/Pagos/Details/@p.Id" class="btn btn-sm btn-outline-secondary" aria-label="Ver">
+                                    <i class="bi bi-eye"></i>
+                                </a>
                             </td>
                         </tr>
                     }
@@ -48,21 +152,32 @@
             </table>
         </div>
     </div>
+
     @if (totalPages > 1)
     {
-        <nav class="mt-4 d-flex justify-content-center"><ul class="pagination">
-            <li class="page-item @(page <= 1 ? "disabled" : "")"><a class="page-link" href="?q=@q&page=@(page-1)"><i class="bi bi-chevron-left"></i></a></li>
-            @for (int i = Math.Max(1, page-2); i <= Math.Min(totalPages, page+2); i++) { <li class="page-item @(i==page?"active":"")"><a class="page-link" href="?q=@q&page=@i">@i</a></li> }
-            <li class="page-item @(page >= totalPages ? "disabled" : "")"><a class="page-link" href="?q=@q&page=@(page+1)"><i class="bi bi-chevron-right"></i></a></li>
-        </ul></nav>
+        <nav class="mt-4 d-flex justify-content-center">
+            <ul class="pagination">
+                <li class="page-item @(page <= 1 ? "disabled" : "")">
+                    <a class="page-link" href="?q=@q&page=@(page-1)"><i class="bi bi-chevron-left"></i></a>
+                </li>
+                @for (int i = Math.Max(1, page - 2); i <= Math.Min(totalPages, page + 2); i++)
+                {
+                    <li class="page-item @(i == page ? "active" : "")">
+                        <a class="page-link" href="?q=@q&page=@i">@i</a>
+                    </li>
+                }
+                <li class="page-item @(page >= totalPages ? "disabled" : "")">
+                    <a class="page-link" href="?q=@q&page=@(page+1)"><i class="bi bi-chevron-right"></i></a>
+                </li>
+            </ul>
+        </nav>
     }
 }
-else
+else if (!sinPago.Any())
 {
     <div class="empty-state">
         <div class="empty-icon text-success"><i class="bi bi-cash-stack"></i></div>
         <h3>Sin pagos registrados</h3>
-        <p class="text-muted">Registra el primer pago de la parroquia.</p>
-        <a href="/Pagos/Create" class="btn btn-primary btn-icon"><i class="bi bi-plus-lg"></i> Registrar Pago</a>
+        <p class="text-muted">Los pagos aparecerán aquí cuando registres un servicio.</p>
     </div>
 }

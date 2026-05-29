@@ -2,7 +2,18 @@
 @{
     ViewData["Title"] = "Registrar Pago";
     var hoy = DateTime.Today.ToString("yyyy-MM-dd");
+    string? tipo = ViewBag.Tipo as string;
+    int? sacramentoId = ViewBag.SacramentoId as int?;
+    bool tieneContexto = !string.IsNullOrEmpty(tipo) && sacramentoId.HasValue;
+    var tipoLabel = tipo switch {
+        "Bautizo"         => "Bautizo",
+        "PrimeraComunion" => "Primera Comunión",
+        "Confirmacion"    => "Confirmación",
+        "Matrimonio"      => "Matrimonio",
+        _                 => ""
+    };
 }
+
 <div class="page-header">
     <div>
         <h1 class="page-title">Registrar Pago</h1>
@@ -12,10 +23,31 @@
         </ol></nav>
     </div>
 </div>
+
 <div class="row justify-content-center">
     <div class="col-12 col-lg-7">
+
+        @* Aviso de contexto cuando se llega desde un sacramento *@
+        @if (tieneContexto)
+        {
+            <div class="alert alert-info d-flex align-items-center gap-2 mb-4">
+                <i class="bi bi-link-45deg fs-5 flex-shrink-0"></i>
+                <div>
+                    Este pago se vinculará automáticamente al registro de
+                    <strong>@tipoLabel</strong> seleccionado.
+                </div>
+            </div>
+        }
+
         <div class="card-panel">
             <form asp-action="Create" method="post">
+                @* Campos ocultos para vincular al sacramento *@
+                @if (tieneContexto)
+                {
+                    <input type="hidden" name="tipo" value="@tipo" />
+                    <input type="hidden" name="sacramentoId" value="@sacramentoId" />
+                }
+
                 <div class="form-section-title"><i class="bi bi-receipt me-2 text-success"></i>Información del Pago</div>
                 <div class="row g-3">
                     <div class="col-12 col-md-6">
@@ -60,17 +92,21 @@
                     </div>
                     <div class="col-12">
                         <label asp-for="Notas" class="form-label"></label>
-                        <textarea asp-for="Notas" class="form-control" rows="3" placeholder="Observaciones adicionales…"></textarea>
+                        <textarea asp-for="Notas" class="form-control" rows="2" placeholder="Observaciones adicionales (opcional)…"></textarea>
                         <span asp-validation-for="Notas" class="text-danger small"></span>
                     </div>
                 </div>
+
                 <div class="alert alert-info d-flex align-items-center gap-2 mt-3">
                     <i class="bi bi-info-circle-fill flex-shrink-0"></i>
                     <div class="small">El pago se registrará como <strong>Pendiente</strong>. Desde el detalle podrás confirmarlo o rechazarlo.</div>
                 </div>
+
                 <div class="form-actions mt-4">
                     <a href="/Pagos" class="btn btn-outline-secondary">Cancelar</a>
-                    <button type="submit" class="btn btn-primary btn-icon"><i class="bi bi-check-lg"></i> Registrar Pago</button>
+                    <button type="submit" class="btn btn-primary btn-icon">
+                        <i class="bi bi-check-lg"></i> Registrar Pago
+                    </button>
                 </div>
             </form>
         </div>

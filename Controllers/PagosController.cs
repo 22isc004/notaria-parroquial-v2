@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using NotariaParroquial.Data;
 using NotariaParroquial.Models;
+using NotariaParroquial.Models.ViewModels;
 using NotariaParroquial.Services;
 
 namespace NotariaParroquial.Controllers;
@@ -35,20 +36,129 @@ public class PagosController : Controller
             .Skip((page - 1) * pageSize).Take(pageSize).ToListAsync();
         ViewBag.Query = q; ViewBag.Estado = estado;
         ViewBag.Page = page; ViewBag.TotalPages = (int)Math.Ceiling(total / (double)pageSize); ViewBag.Total = total;
+
+        // Sacramentos sin pago vinculado
+        var sinPago = new List<ServicioSinPago>();
+
+        var bautizos = await _db.Bautizos.Include(b => b.Feligres)
+            .Where(b => b.PagoId == null && b.Estado != EstadoSolicitud.Cancelado)
+            .OrderByDescending(b => b.FechaRegistro).ToListAsync();
+        sinPago.AddRange(bautizos.Select(b => new ServicioSinPago
+        {
+            Tipo = "Bautizo", TipoIcono = "bi-droplet-fill", TipoColor = "text-primary",
+            Id = b.Id, Nombre = b.Feligres?.NombreCompleto ?? "—",
+            Folio = b.NumeroBoleta, Fecha = b.FechaBautizo, Estado = b.Estado
+        }));
+
+        var comuniones = await _db.PrimerasComuniones.Include(p => p.Feligres)
+            .Where(p => p.PagoId == null && p.Estado != EstadoSolicitud.Cancelado)
+            .OrderByDescending(p => p.FechaRegistro).ToListAsync();
+        sinPago.AddRange(comuniones.Select(c => new ServicioSinPago
+        {
+            Tipo = "PrimeraComunion", TipoIcono = "bi-cup-hot-fill", TipoColor = "text-success",
+            Id = c.Id, Nombre = c.Feligres?.NombreCompleto ?? "—",
+            Folio = c.NumeroBoleta, Fecha = c.FechaComunion, Estado = c.Estado
+        }));
+
+        var confirmaciones = await _db.Confirmaciones.Include(c => c.Feligres)
+            .Where(c => c.PagoId == null && c.Estado != EstadoSolicitud.Cancelado)
+            .OrderByDescending(c => c.FechaRegistro).ToListAsync();
+        sinPago.AddRange(confirmaciones.Select(c => new ServicioSinPago
+        {
+            Tipo = "Confirmacion", TipoIcono = "bi-shield-fill-check", TipoColor = "text-warning",
+            Id = c.Id, Nombre = c.Feligres?.NombreCompleto ?? "—",
+            Folio = c.NumeroBoleta, Fecha = c.FechaConfirmacion, Estado = c.Estado
+        }));
+
+        var matrimonios = await _db.Matrimonios
+            .Where(m => m.PagoId == null && m.Estado != EstadoSolicitud.Cancelado)
+            .OrderByDescending(m => m.FechaRegistro).ToListAsync();
+        sinPago.AddRange(matrimonios.Select(m => new ServicioSinPago
+        {
+            Tipo = "Matrimonio", TipoIcono = "bi-heart-fill", TipoColor = "text-danger",
+            Id = m.Id, Nombre = $"{m.Contrayente1Nombre} & {m.Contrayente2Nombre}",
+            Folio = m.NumeroActa, Fecha = m.FechaMatrimonio, Estado = m.Estado
+        }));
+
+        ViewBag.SinPago = sinPago.OrderByDescending(s => s.Fecha).ToList();
         return View(items);
     }
 
-    public IActionResult Create() => View(new Pago { FechaPago = DateOnly.FromDateTime(DateTime.Today) });
+    [HttpGet]
+    public async Task<IActionResult> Create(string? tipo, int? sacramentoId)
+    {
+        var pago = new Pago { FechaPago = DateOnly.FromDateTime(DateTime.Today) };
+
+        // Pre-fill from sacramento context
+        if (!string.IsNullOrEmpty(tipo) && sacramentoId.HasValue)
+        {
+            switch (tipo)
+            {
+                case "Bautizo":
+                    var b = await _db.Bautizos.Include(x => x.Feligres).FirstOrDefaultAsync(x => x.Id == sacramentoId);
+                    if (b != null) { pago.TipoServicio = TipoServicio.Bautizo; pago.NombreSolicitante = b.Feligres?.NombreCompleto ?? ""; }
+                    break;
+                case "PrimeraComunion":
+                    var c = await _db.PrimerasComuniones.Include(x => x.Feligres).FirstOrDefaultAsync(x => x.Id == sacramentoId);
+                    if (c != null) { pago.TipoServicio = TipoServicio.PrimeraComunion; pago.NombreSolicitante = c.Feligres?.NombreCompleto ?? ""; }
+                    break;
+                case "Confirmacion":
+                    var cf = await _db.Confirmaciones.Include(x => x.Feligres).FirstOrDefaultAsync(x => x.Id == sacramentoId);
+                    if (cf != null) { pago.TipoServicio = TipoServicio.Confirmacion; pago.NombreSolicitante = cf.Feligres?.NombreCompleto ?? ""; }
+                    break;
+                case "Matrimonio":
+                    var m = await _db.Matrimonios.FirstOrDefaultAsync(x => x.Id == sacramentoId);
+                    if (m != null) { pago.TipoServicio = TipoServicio.Matrimonio; pago.NombreSolicitante = $"{m.Contrayente1Nombre} & {m.Contrayente2Nombre}"; }
+                    break;
+            }
+        }
+
+        ViewBag.Tipo = tipo;
+        ViewBag.SacramentoId = sacramentoId;
+        return View(pago);
+    }
 
     [HttpPost, ValidateAntiForgeryToken]
-    public async Task<IActionResult> Create(Pago model)
+    public async Task<IActionResult> Create(Pago model, string? tipo, int? sacramentoId)
     {
-        if (!ModelState.IsValid) return View(model);
+        if (!ModelState.IsValid)
+        {
+            ViewBag.Tipo = tipo;
+            ViewBag.SacramentoId = sacramentoId;
+            return View(model);
+        }
+
         model.Referencia = GenerateRef();
         _db.Pagos.Add(model);
         await _db.SaveChangesAsync();
+
+        // Vincular al sacramento de origen
+        if (!string.IsNullOrEmpty(tipo) && sacramentoId.HasValue)
+        {
+            switch (tipo)
+            {
+                case "Bautizo":
+                    var b = await _db.Bautizos.FindAsync(sacramentoId.Value);
+                    if (b != null) b.PagoId = model.Id;
+                    break;
+                case "PrimeraComunion":
+                    var c = await _db.PrimerasComuniones.FindAsync(sacramentoId.Value);
+                    if (c != null) c.PagoId = model.Id;
+                    break;
+                case "Confirmacion":
+                    var cf = await _db.Confirmaciones.FindAsync(sacramentoId.Value);
+                    if (cf != null) cf.PagoId = model.Id;
+                    break;
+                case "Matrimonio":
+                    var m = await _db.Matrimonios.FindAsync(sacramentoId.Value);
+                    if (m != null) m.PagoId = model.Id;
+                    break;
+            }
+            await _db.SaveChangesAsync();
+        }
+
         TempData["Toast"] = "success|Pago registrado. Pendiente de confirmación.";
-        return RedirectToAction(nameof(Index));
+        return RedirectToAction(nameof(Details), new { id = model.Id });
     }
 
     public async Task<IActionResult> Details(int id)
@@ -82,11 +192,8 @@ public class PagosController : Controller
         if (!string.IsNullOrEmpty(pago.EmailNotificacion))
         {
             correoEnviado = await _correo.EnviarConfirmacionPago(
-                pago.EmailNotificacion,
-                pago.NombreSolicitante,
-                pago.Referencia ?? "-",
-                pago.Monto);
-
+                pago.EmailNotificacion, pago.NombreSolicitante,
+                pago.Referencia ?? "-", pago.Monto);
             mensaje = correoEnviado
                 ? "Pago confirmado y correo enviado al feligrés."
                 : "Pago confirmado, pero el correo no pudo enviarse.";

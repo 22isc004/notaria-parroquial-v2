@@ -53,8 +53,8 @@
                 <h5 class="panel-title"><i class="bi bi-cash-coin text-success me-2"></i>Pago</h5>
                 @if (Model.Pago == null)
                 {
-                    <a href="/Pagos/Create" class="btn btn-sm btn-outline-success btn-icon">
-                        <i class="bi bi-plus"></i> Registrar pago
+                    <a href="/Pagos/Create?tipo=Bautizo&sacramentoId=@Model.Id" class="btn btn-sm btn-outline-success btn-icon">
+                        <i class="bi bi-cash-coin"></i> Registrar pago
                     </a>
                 }
             </div>

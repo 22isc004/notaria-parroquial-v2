@@ -15,7 +15,7 @@
     </div>
 </div>
 <div class="row g-4">
-    <div class="col-12 col-lg-8">
+    <div class="col-12 col-lg-6">
         <div class="card-panel">
             <div class="panel-header"><h5 class="panel-title"><i class="bi bi-heart-fill me-2" style="color:#ec4899"></i>Información del Matrimonio</h5></div>
             <div class="detail-grid">
@@ -34,6 +34,32 @@
             </div>
             @if (!string.IsNullOrEmpty(Model.Observaciones))
             { <hr><p class="text-muted small mb-0"><strong>Observaciones:</strong> @Model.Observaciones</p> }
+        </div>
+    </div>
+    <div class="col-12 col-lg-6">
+        <div class="card-panel">
+            <div class="panel-header">
+                <h5 class="panel-title"><i class="bi bi-cash-coin text-success me-2"></i>Pago</h5>
+                @if (Model.Pago == null)
+                {
+                    <a href="/Pagos/Create?tipo=Matrimonio&sacramentoId=@Model.Id" class="btn btn-sm btn-outline-success btn-icon">
+                        <i class="bi bi-cash-coin"></i> Registrar pago
+                    </a>
+                }
+            </div>
+            @if (Model.Pago != null)
+            {
+                <div class="detail-grid">
+                    <div class="detail-item"><span class="detail-label">Referencia</span><code class="detail-value">@Model.Pago.Referencia</code></div>
+                    <div class="detail-item"><span class="detail-label">Monto</span><span class="detail-value text-success fw-600">$@Model.Pago.Monto.ToString("N2")</span></div>
+                    <div class="detail-item"><span class="detail-label">Estado</span><span class="detail-value"><span class="badge @(Model.Pago.Estado == EstadoPago.Confirmado ? "badge-success" : Model.Pago.Estado == EstadoPago.Pendiente ? "badge-warning" : "badge-danger")">@Model.Pago.Estado</span></span></div>
+                </div>
+                <a href="/Pagos/Details/@Model.Pago.Id" class="btn btn-sm btn-outline-secondary mt-2">Ver detalle del pago</a>
+            }
+            else
+            {
+                <div class="empty-state-sm"><i class="bi bi-receipt"></i><p>Sin pago registrado</p></div>
+            }
         </div>
     </div>
 </div>
