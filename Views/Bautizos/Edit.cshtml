@@ -36,6 +36,7 @@
                     <div class="col-12 col-md-6">
                         <label asp-for="Estado" class="form-label"></label>
                         <select asp-for="Estado" class="form-select" asp-items="Html.GetEnumSelectList<EstadoSolicitud>()"></select>
+                        <span asp-validation-for="Estado" class="text-danger small"></span>
                     </div>
                     <div class="col-12">
                         <label asp-for="Sacerdote" class="form-label"></label>
@@ -45,18 +46,22 @@
                     <div class="col-12 col-md-6">
                         <label asp-for="PadrinoNombre" class="form-label"></label>
                         <input asp-for="PadrinoNombre" class="form-control" />
+                        <span asp-validation-for="PadrinoNombre" class="text-danger small"></span>
                     </div>
                     <div class="col-12 col-md-6">
                         <label asp-for="MadrinaNombre" class="form-label"></label>
                         <input asp-for="MadrinaNombre" class="form-control" />
+                        <span asp-validation-for="MadrinaNombre" class="text-danger small"></span>
                     </div>
                     <div class="col-12">
                         <label asp-for="LugarBautizo" class="form-label"></label>
                         <input asp-for="LugarBautizo" class="form-control" />
+                        <span asp-validation-for="LugarBautizo" class="text-danger small"></span>
                     </div>
                     <div class="col-12">
                         <label asp-for="Observaciones" class="form-label"></label>
                         <textarea asp-for="Observaciones" class="form-control" rows="3"></textarea>
+                        <span asp-validation-for="Observaciones" class="text-danger small"></span>
                     </div>
                 </div>
                 <div class="form-actions mt-4">
@@ -69,3 +74,9 @@
         </div>
     </div>
 </div>
+
+@section Scripts {
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jquery-validation@1.19.5/dist/jquery.validate.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jquery-validation-unobtrusive@4.0.0/dist/jquery.validate.unobtrusive.min.js"></script>
+}
