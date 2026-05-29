@@ -17,7 +17,6 @@ public class Matrimonio
     public string Contrayente2Nombre { get; set; } = string.Empty;
 
     [Required(ErrorMessage = "La fecha del matrimonio es requerida.")]
-    [FechaNoAnterior]
     [Display(Name = "Fecha del Matrimonio")]
     [DataType(DataType.Date)]
     public DateOnly FechaMatrimonio { get; set; }

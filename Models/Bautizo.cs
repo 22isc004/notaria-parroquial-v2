@@ -12,7 +12,6 @@ public class Bautizo
     public Feligres? Feligres { get; set; }
 
     [Required(ErrorMessage = "La fecha de bautizo es requerida.")]
-    [FechaNoAnterior]
     [Display(Name = "Fecha de Bautizo")]
     [DataType(DataType.Date)]
     public DateOnly FechaBautizo { get; set; }

@@ -12,7 +12,6 @@ public class Confirmacion
     public Feligres? Feligres { get; set; }
 
     [Required(ErrorMessage = "La fecha de confirmación es requerida.")]
-    [FechaNoAnterior]
     [Display(Name = "Fecha de Confirmación")]
     [DataType(DataType.Date)]
     public DateOnly FechaConfirmacion { get; set; }

@@ -30,7 +30,6 @@ public class Pago
     public decimal Monto { get; set; }
 
     [Required(ErrorMessage = "La fecha de pago es requerida.")]
-    [FechaNoAnterior]
     [Display(Name = "Fecha de Pago")]
     [DataType(DataType.Date)]
     public DateOnly? FechaPago { get; set; }

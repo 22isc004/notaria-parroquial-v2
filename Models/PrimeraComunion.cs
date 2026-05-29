@@ -12,7 +12,6 @@ public class PrimeraComunion
     public Feligres? Feligres { get; set; }
 
     [Required(ErrorMessage = "La fecha de comunión es requerida.")]
-    [FechaNoAnterior]
     [Display(Name = "Fecha de Primera Comunión")]
     [DataType(DataType.Date)]
     public DateOnly FechaComunion { get; set; }
